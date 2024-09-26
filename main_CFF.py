@@ -76,8 +76,9 @@ def one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train'):
         # Classifier head
         model.train() if phase=='train' else model.eval()
         torch.set_grad_enabled(True if phase=='train' else False)
-        output = model.classifier_head(features.detach())
-        loss   = criterion(output, targets)
+        outputs = model.classifier_head(features.detach())
+        print(outputs.shape)
+        loss   = criterion(outputs, targets)
 
         if phase=='train':
             optimizer.zero_grad()
