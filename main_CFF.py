@@ -44,7 +44,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
                 loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
 
 
-            if phase=='Train':
+            if phase=='train':
                 optimizers[l].zero_grad()
                 loss.backward()
                 optimizers[l].step()
@@ -62,7 +62,7 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-    print(model)
+    print(model.layers[0])
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, 0.1, opt.L)
