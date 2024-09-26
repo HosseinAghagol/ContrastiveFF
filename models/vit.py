@@ -59,6 +59,7 @@ class PositionalEncoder(nn.Module):
     def __init__(self,opt):
         super().__init__()
         # Learnable parameters for position embedding
+        print((1, opt.num_patches, opt.E))
         self.pos_embed   = nn.Parameter(torch.randn((1, opt.num_patches, opt.E)))
 
 
