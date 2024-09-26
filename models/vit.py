@@ -128,4 +128,4 @@ class ViT(nn.Module):
 
         # Pass through classification head
         x = self.classifier_head(x)
-        return 
+        return x
