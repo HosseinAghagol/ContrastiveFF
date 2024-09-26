@@ -53,16 +53,51 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
     return losses/n
 
 
+
+def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
+    model.train() if phase=='train' else model.eval()
+
+    losses = 0
+    n      = 0
+
+    
+    for batch in loader[phase]:
+
+        features = batch[0].to('cuda')
+        targets  = batch[1].to('cuda')
+
+        n += len(targets)
+
+        # Extracting feature
+        model.eval()
+        with torch.no_grad():
+            for l in range(opt.L): features = model.layers[l](features)
+
+        # Classifier head
+        model.train() if phase=='train' else model.eval()
+        torch.set_grad_enabled(True if phase=='train' else False)
+        output = model.classifier_head(features.detach())
+        loss   = criterion(output, targets)
+
+        if phase=='train':
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            losses += loss.item() * len(targets)
+
+    return losses/n
+
 def main():
 
     opt = parse_option()
     
     # build data loader
+    print('\nPreparing data')
     loaders = set_loaders(opt)
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-    print(model.layers[0])
+
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, 0.1, opt.L)
@@ -72,8 +107,9 @@ def main():
     
 
     # training routine
-    ##################### Stage 1 #####################
-    for epoch in range(1, opt.epochs + 1):
+    print('\n################## training-Stage 1 ##################')
+    # Stage 1 
+    for epoch in range(1, opt.epochs1 + 1):
         losses = {'train':0,'valid':0}
         # train for one epoch
         time1  = time.time()
@@ -83,7 +119,7 @@ def main():
 
         time2  = time.time()
 
-        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs, time2 - time1))
+        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs1, time2 - time1))
 
         print()
         print(losses['train'])
@@ -93,7 +129,27 @@ def main():
         # if losses['valid'][-1] < loss_valid_min:
         #     save_model(model,optimizers)
 
-    ##################### Stage 2 #####################
+
+    print('\n################## training-Stage 2 ##################')
+    # Stage 2
+
+    for epoch in range(1, opt.epochs2 + 1):
+        losses = {'train':0,'valid':0}
+        # train for one epoch
+        time1  = time.time()
+
+        losses['train'] = one_epoch_stage2(loaders, model, criterions, optimizers, opt, phase='train')
+        losses['valid'] = one_epoch_stage2(loaders, model, criterions, optimizers, opt, phase='valid')
+
+        time2  = time.time()
+
+        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs2, time2 - time1))
+
+        print()
+        print(losses['train'])
+        print(losses['valid'])
+        print()
+
 
 if __name__ == '__main__':
     main()
