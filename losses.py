@@ -14,9 +14,6 @@ class SupMCon(nn.Module):
     def forward(self, features, labels=None):
         device = 'cuda'
 
-        features[0] = features[0].mean(1)
-        features[1] = features[1].mean(1)
-
         labels = labels.contiguous().view(-1, 1)
         mask   = torch.eq(labels, labels.T).float().to(device)
 
@@ -25,7 +22,7 @@ class SupMCon(nn.Module):
         count = 2
 
         contrast_feature = torch.cat(features, dim=0)
-        
+    
 
         # tile mask
         mask = mask.repeat(count, count)
