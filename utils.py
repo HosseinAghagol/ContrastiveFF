@@ -131,7 +131,7 @@ def set_loaders(opt):
     train_dataset  = datasets.CIFAR10('./data/',train=True,transform=TwoCropTransform(train_transform),download=True)
     test_dataset   = datasets.CIFAR10('./data/',train=False,transform=test_transform,download=True)
     opt.patch_size  = 4
-    opt.num_patches = (32**2) / (opt.patch_size**2)
+    opt.num_patches = int((32**2) / (opt.patch_size**2))
     # obtain training indices that will be used for validation
     num_train = len(train_dataset)
     indices   = list(range(num_train))
