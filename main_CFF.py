@@ -41,7 +41,8 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
             else: 
                 x1 = model.layers[l](x1.detach())
                 x2 = model.layers[l](x2.detach())
-                loss = criterions[l]([x1,x2], targets)
+                loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+
 
             if phase=='Train':
                 optimizers[l].zero_grad()
@@ -84,8 +85,11 @@ def main():
 
         print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs, time2 - time1))
 
+        print()
         print(losses['train'])
         print(losses['valid'])
+        print()
+        
         # if losses['valid'][-1] < loss_valid_min:
         #     save_model(model,optimizers)
 
