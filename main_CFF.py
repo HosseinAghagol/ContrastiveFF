@@ -1,5 +1,5 @@
 import os
-from time import time
+import time
 from tqdm import tqdm
 
 import numpy as np
@@ -20,12 +20,11 @@ from losses import SupMCon
 def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
     model.train() if phase=='train' else model.eval()
 
-    losses = [0 for _ in range(opt.L)]
+    losses = torch.zeros(opt.L)
     n      = 0
 
     torch.set_grad_enabled(True if phase=='train' else False)
-    for batch in tqdm(loader):
-
+    for batch in tqdm(loader[phase]):
         if opt.one_forward: x1 = batch[0].to('cuda')
         else: x1,x2 = batch[0][0].to('cuda'),batch[0][1].to('cuda')
 
@@ -36,12 +35,12 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
         for l in range(opt.L):
 
             if opt.one_forward:
-                x1 = model.layer[l](x1.detach())
+                x1 = model.layers[l](x1.detach())
                 loss = criterions[l]([x1], targets)
 
             else: 
-                x1 = model.layer[l](x1.detach())
-                x2 = model.layer[l](x2.detach())
+                x1 = model.layers[l](x1.detach())
+                x2 = model.layers[l](x2.detach())
                 loss = criterions[l]([x1,x2], targets)
 
             if phase=='Train':
@@ -62,7 +61,7 @@ def main():
     loaders = set_loaders(opt)
 
     # build model and criterion
-    model = ViT(opt)
+    model = ViT(opt).to('cuda')
 
     # build optimizer
     optimizers = set_optimizers(model, opt)

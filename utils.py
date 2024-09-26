@@ -32,7 +32,7 @@ def parse_option():
     
     parser.add_argument('--temp', type=float, default=0.15, help='temperature for contrastive loss function')
 
-    parser.add_argument('--two_view', type=bool, default=True, help='')\
+    parser.add_argument('--one_forward', action='store_true', help='')\
     
     parser.add_argument('--m0', type=float, default=0.4, help='')
 

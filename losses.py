@@ -21,20 +21,20 @@ class SupMCon(nn.Module):
         mask   = torch.eq(labels, labels.T).float().to(device)
 
 
-        n = len(features[0]) * 2
+        n = len(features[0])
         count = 2
 
         contrast_feature = torch.cat(features, dim=0)
         anchor_feature   = contrast_feature
 
         # tile mask
-        mask = mask.repeat(n, n)
+        mask = mask.repeat(count, count)
 
         # mask-out self-contrast cases
         logits_mask = torch.scatter(
             torch.ones_like(mask),
             1,
-            torch.arange(count * count).view(-1, 1).to(device),
+            torch.arange(n * count).view(-1, 1).to(device),
             0
         )
 
