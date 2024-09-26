@@ -87,12 +87,41 @@ def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
 
     return losses/n
 
+
+
+def eval(loader, model, criterion, opt):
+
+    model.eval()
+    losses = 0
+    n      = 0
+
+    torch.set_grad_enabled(False)
+    for batch in loader:
+
+        features = batch[0].to('cuda')
+        targets  = batch[1].to('cuda')
+
+        n += len(targets)
+
+        # Extracting feature
+        for l in range(opt.L): features = model.layers[l](features)
+        # Classifier head
+        output = model.classifier_head(features.detach())
+        loss   = criterion(output, targets)
+        num_corrects = torch.sum(torch.argmax(output, dim=1) == targets).cpu().item()
+
+    accuracy = num_corrects/n
+
+    return losses/n, accuracy
+
+
+
 def main():
 
     opt = parse_option()
     
     # build data loader
-    print('\nPreparing data')
+    print('\n################## Preparing data ##################')
     loaders = set_loaders(opt)
 
     # build model and criterion
@@ -100,14 +129,14 @@ def main():
 
     # build optimizer
     optimizers = set_optimizers(model, opt)
-    positive_margin = np.linspace(opt.m0, 0.1, opt.L)
+    positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
     criterions = [SupMCon(opt, positive_margin[l]) for l in range(len(model.layers))]
 
     loss_valid_min = -np.inf
     
 
     # training routine
-    print('\n################## training-Stage 1 ##################')
+    print('\n################## training-Stage 1 ##################\n')
     # Stage 1 
     for epoch in range(1, opt.epochs1 + 1):
         losses = {'train':0,'valid':0}
@@ -130,26 +159,33 @@ def main():
         #     save_model(model,optimizers)
 
 
-    print('\n################## training-Stage 2 ##################')
+    print('\n################## training-Stage 2 ##################\n')
     # Stage 2
 
+    optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
+    criterion = torch.nn.CrossEntropyLoss()
+
     for epoch in range(1, opt.epochs2 + 1):
-        losses = {'train':0,'valid':0}
+        loss = {'train':0,'valid':0}
         # train for one epoch
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage2(loaders, model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage2(loaders, model, criterions, optimizers, opt, phase='valid')
+        loss['train'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train')
+        loss['valid'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='valid')
 
         time2  = time.time()
 
         print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs2, time2 - time1))
 
         print()
-        print(losses['train'])
-        print(losses['valid'])
+        print(loss['train'])
+        print(loss['valid'])
         print()
 
+    print('\n################## Evaluation ##################\n')
+
+    loss, accuracy = eval(loaders['test'], model, criterion, opt)
+    print(loss, accuracy)
 
 if __name__ == '__main__':
     main()

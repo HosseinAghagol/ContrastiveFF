@@ -37,6 +37,8 @@ def parse_option():
     parser.add_argument('--one_forward', action='store_true', help='')\
     
     parser.add_argument('--m0', type=float, default=0.4, help='')
+    
+    parser.add_argument('--mL', type=float, default=0.1, help='')
 
     # parser.add_argument('--print_freq', type=int, default=10,
     #                     help='print frequency')

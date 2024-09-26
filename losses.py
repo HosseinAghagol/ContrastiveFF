@@ -41,9 +41,9 @@ class SupMCon(nn.Module):
         anchor_feature   = contrast_feature
 
         anchor_dot_contrast = torch.matmul(anchor_feature, contrast_feature.T)
-        # anchor_dot_contrast = torch.where(mask == 1,
-        #                           torch.clamp(anchor_dot_contrast+self.positive_margin,max=1),
-        #                           anchor_dot_contrast)
+        anchor_dot_contrast = torch.where(mask == 1,
+                                  torch.clamp(anchor_dot_contrast+self.positive_margin,max=1),
+                                  anchor_dot_contrast)
 
         # anchor_dot_contrast = torch.where(mask == 0,
         #                           torch.clamp(anchor_dot_contrast-self.negative_margin,min=0),
