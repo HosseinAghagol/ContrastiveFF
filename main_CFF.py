@@ -24,7 +24,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
     n      = 0
 
     torch.set_grad_enabled(True if phase=='train' else False)
-    for batch in tqdm(loader[phase]):
+    for batch in loader[phase]:
         if opt.one_forward: x1 = batch[0].to('cuda')
         else: x1,x2 = batch[0][0].to('cuda'),batch[0][1].to('cuda')
 
@@ -82,7 +82,8 @@ def main():
         losses['valid'] = one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='valid')
 
         time2  = time.time()
-        print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
+
+        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
