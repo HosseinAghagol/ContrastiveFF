@@ -59,7 +59,6 @@ class PositionalEncoder(nn.Module):
     def __init__(self,opt):
         super().__init__()
         # Learnable parameters for position embedding
-        print((1, opt.num_patches, opt.E))
         self.pos_embed   = nn.Parameter(torch.randn((1, opt.num_patches, opt.E)))
 
 
@@ -102,9 +101,17 @@ class ViT(nn.Module):
     def __init__(self, opt):
         super().__init__()
 
-        # First layer
-        self.layers = nn.ModuleList([PatchingLayer(opt), nn.Linear(3*(opt.patch_size**2), opt.E), PositionalEncoder(opt), ViTEncoder(opt.E, opt.E, opt.H)])
         
+        self.layers = nn.ModuleList()
+
+        # First layer
+        self.layers.append(nn.Sequential(
+          PatchingLayer(opt),
+          nn.Linear(3*(opt.patch_size**2), opt.E),
+          PositionalEncoder(opt),
+          ViTEncoder(opt.E, opt.E, opt.H)
+        ))
+        # self.layers = nn.ModuleList([PatchingLayer(opt), nn.Linear(3*(opt.patch_size**2), opt.E), PositionalEncoder(opt), ViTEncoder(opt.E, opt.E, opt.H)])
         # Another layers
         self.layers.extend([ViTEncoder(opt.E, opt.E, opt.H) for _ in range(1,opt.L)])
             
