@@ -49,7 +49,6 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
                 optimizers[l].step()
 
             losses[l] += loss.item() * len(targets)
-        break
     return losses/n
 
 
@@ -87,7 +86,6 @@ def main():
 
         print(losses['train'])
         print(losses['valid'])
-        break
         # if losses['valid'][-1] < loss_valid_min:
         #     save_model(model,optimizers)
 
