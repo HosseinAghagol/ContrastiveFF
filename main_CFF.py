@@ -17,14 +17,14 @@ from models.vit import ViT
 from losses import SupMCon
 
 
-def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
+def one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='train'):
     model.train() if phase=='train' else model.eval()
 
     losses = torch.zeros(opt.L)
     n      = 0
 
     torch.set_grad_enabled(True if phase=='train' else False)
-    for batch in loader[phase]:
+    for batch in loaders[phase]:
         if opt.one_forward: x1 = batch[0].to('cuda')
         else: x1,x2 = batch[0][0].to('cuda'),batch[0][1].to('cuda')
 
@@ -54,16 +54,16 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
 
 
 
-def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
+def one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train'):
     model.train() if phase=='train' else model.eval()
 
     losses = 0
     n      = 0
 
     
-    for batch in loader[phase]:
+    for batch in loaders[phase]:
 
-        features = batch[0].to('cuda')
+        features = batch[0][0].to('cuda')
         targets  = batch[1].to('cuda')
 
         n += len(targets)
@@ -89,14 +89,14 @@ def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
 
 
 
-def eval(loader, model, criterion, opt):
+def eval(test_loader, model, criterion, opt):
 
     model.eval()
     losses = 0
     n      = 0
 
     torch.set_grad_enabled(False)
-    for batch in loader:
+    for batch in test_loader:
 
         features = batch[0].to('cuda')
         targets  = batch[1].to('cuda')
@@ -121,7 +121,7 @@ def main():
     opt = parse_option()
     
     # build data loader
-    print('\n################## Preparing data ##################')
+    print('\n################## Preparing data ##################\n')
     loaders = set_loaders(opt)
 
     # build model and criterion
@@ -136,7 +136,7 @@ def main():
     
 
     # training routine
-    print('\n################## training-Stage 1 ##################\n')
+    print('\n################## Training-Stage 1 ##################\n')
     # Stage 1 
     for epoch in range(1, opt.epochs1 + 1):
         losses = {'train':0,'valid':0}
@@ -159,7 +159,7 @@ def main():
         #     save_model(model,optimizers)
 
 
-    print('\n################## training-Stage 2 ##################\n')
+    print('\n################## Training-Stage 2 ##################\n')
     # Stage 2
 
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
