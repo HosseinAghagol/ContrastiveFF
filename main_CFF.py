@@ -76,14 +76,15 @@ def one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train'):
         # Classifier head
         model.train() if phase=='train' else model.eval()
         torch.set_grad_enabled(True if phase=='train' else False)
-        outputs = model.classifier_head(features.mean(1).detach())
+        outputs = model.classifier_head(features.detach())
         loss   = criterion(outputs, targets)
 
         if phase=='train':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            losses += loss.item() * len(targets)
+
+        losses += loss.item() * len(targets)
 
     return losses/n
 
@@ -93,7 +94,7 @@ def eval(test_loader, model, criterion, opt):
 
     model.eval()
     losses = 0
-    n      = 0
+    n    = 0
 
     torch.set_grad_enabled(False)
     for batch in test_loader:
@@ -106,9 +107,12 @@ def eval(test_loader, model, criterion, opt):
         # Extracting feature
         for l in range(opt.L): features = model.layers[l](features)
         # Classifier head
-        output = model.classifier_head(features.mean(1))
+        output = model.classifier_head(features)
+
         loss   = criterion(output, targets)
+        
         num_corrects = torch.sum(torch.argmax(output, dim=1) == targets).cpu().item()
+        losses += loss.item() * len(targets)
 
     accuracy = num_corrects/n
 
@@ -166,26 +170,26 @@ def main():
     criterion = torch.nn.CrossEntropyLoss()
 
     for epoch in range(1, opt.epochs2 + 1):
-        loss = {'train':0,'valid':0}
+        losses = {'train':0,'valid':0}
         # train for one epoch
         time1  = time.time()
 
-        loss['train'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train')
-        loss['valid'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='valid')
+        losses['train'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train')
+        losses['valid'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='valid')
 
         time2  = time.time()
 
         print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs2, time2 - time1))
 
         print()
-        print(loss['train'])
-        print(loss['valid'])
+        print(losses['train'])
+        print(losses['valid'])
         print()
 
     print('\n################## Evaluation ##################\n')
 
-    loss, accuracy = eval(loaders['test'], model, criterion, opt)
-    print(loss, accuracy)
+    losses, accuracy = eval(loaders['test'], model, criterion, opt)
+    print(losses, accuracy)
 
 if __name__ == '__main__':
     main()
