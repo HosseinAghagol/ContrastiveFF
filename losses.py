@@ -5,7 +5,7 @@ import torch.nn.functional as F
 class SupMCon(nn.Module):
     """Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf.
     It also supports the unsupervised contrastive loss in SimCLR"""
-    def __init__(self, opt,positive_margin):
+    def __init__(self, opt, positive_margin):
         super(SupMCon, self).__init__()
         self.temperature     = opt.temp
         self.positive_margin = positive_margin
@@ -25,7 +25,7 @@ class SupMCon(nn.Module):
         count = 2
 
         contrast_feature = torch.cat(features, dim=0)
-        anchor_feature   = contrast_feature
+        
 
         # tile mask
         mask = mask.repeat(count, count)
@@ -40,13 +40,13 @@ class SupMCon(nn.Module):
 
         mask = mask * logits_mask
         # compute logits
-        anchor_feature   = F.normalize(anchor_feature)
         contrast_feature = F.normalize(contrast_feature)
+        anchor_feature   = contrast_feature
 
         anchor_dot_contrast = torch.matmul(anchor_feature, contrast_feature.T)
-        anchor_dot_contrast = torch.where(mask == 1,
-                                  torch.clamp(anchor_dot_contrast+self.positive_margin,max=1),
-                                  anchor_dot_contrast)
+        # anchor_dot_contrast = torch.where(mask == 1,
+        #                           torch.clamp(anchor_dot_contrast+self.positive_margin,max=1),
+        #                           anchor_dot_contrast)
 
         # anchor_dot_contrast = torch.where(mask == 0,
         #                           torch.clamp(anchor_dot_contrast-self.negative_margin,min=0),

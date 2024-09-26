@@ -49,7 +49,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
                 optimizers[l].step()
 
             losses[l] += loss.item() * len(targets)
-
+        break
     return losses/n
 
 
@@ -62,7 +62,7 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-
+    print(model)
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, 0.1, opt.L)
@@ -87,7 +87,7 @@ def main():
 
         print(losses['train'])
         print(losses['valid'])
-
+        break
         # if losses['valid'][-1] < loss_valid_min:
         #     save_model(model,optimizers)
 
