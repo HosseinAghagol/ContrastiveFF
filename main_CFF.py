@@ -93,8 +93,10 @@ def one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train'):
 def eval(test_loader, model, criterion, opt):
 
     model.eval()
-    losses = 0
-    n    = 0
+    
+    losses       = 0
+    num_corrects = 0
+    n            = 0
 
     torch.set_grad_enabled(False)
     for batch in test_loader:
@@ -111,7 +113,7 @@ def eval(test_loader, model, criterion, opt):
 
         loss   = criterion(output, targets)
         
-        num_corrects = torch.sum(torch.argmax(output, dim=1) == targets).cpu().item()
+        num_corrects += torch.sum(torch.argmax(output, dim=1) == targets).cpu().item()
         losses += loss.item() * len(targets)
 
     accuracy = num_corrects/n
