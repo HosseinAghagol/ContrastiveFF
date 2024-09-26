@@ -116,9 +116,9 @@ class ViT(nn.Module):
         self.layers.extend([ViTEncoder(opt.E, opt.E, opt.H) for _ in range(1,opt.L)])
             
         # Classification head
-        self.classifier_head = nn.Sequential([nn.Linear(opt.E, opt.E),
-                                              nn.ReLU(),
-                                              nn.Linear(opt.E, opt.num_class)])
+        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E),
+                                             nn.ReLU(),
+                                             nn.Linear(opt.E, opt.num_class))
 
     def forward(self, x):
         # Encoding
