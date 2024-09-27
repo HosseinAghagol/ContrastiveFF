@@ -93,6 +93,8 @@ def one_epoch_stage2(x, y, transforms, model, criterion, optimizer, opt, phase='
     return losses/n
 
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def eval(test_loader, model, criterion, opt):
 
@@ -139,7 +141,7 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-
+    print(count_parameters(model))
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
@@ -213,7 +215,7 @@ def main():
 
         time2  = time.time()
 
-        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch, time2 - time1))
+        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs2 + first_epoch, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
