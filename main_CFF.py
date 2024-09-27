@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from utils import parse_option
 from utils import set_optimizers
-# from utils import save_model
+from utils import save_model,load_model
 from utils import set_loaders
 
 from models.vit import ViT
@@ -138,7 +138,7 @@ def main():
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
     criterions = [SupMCon(opt, positive_margin[l]) for l in range(len(model.layers))]
 
-    loss_valid_min = -np.inf
+    loss_valid_min = np.inf
     
 
     # training routine
@@ -154,23 +154,25 @@ def main():
 
         time2  = time.time()
 
-        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs1, time2 - time1))
+        print('epoch [{},{}], {:.1f}s\n'.format(epoch, opt.epochs1, time2 - time1))
 
-        print()
         print(losses['train'])
         print(losses['valid'])
-        print()
         
-        # if losses['valid'][-1] < loss_valid_min:
-        #     save_model(model,optimizers)
+        if losses['valid'][-1] < loss_valid_min:
+            save_model(model)
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1] )
+            loss_valid_min = np.copy(losses['valid'][-1])
 
 
     print('\n################## Training-Stage 2 ##################\n')
     # Stage 2
 
+    model     = load_model(model)
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
 
+    loss_valid_min = np.inf
     for epoch in range(1, opt.epochs2 + 1):
         losses = {'train':0,'valid':0}
         # train for one epoch
@@ -181,13 +183,16 @@ def main():
 
         time2  = time.time()
 
-        print('epoch [{},{}], {:.2f}'.format(epoch, opt.epochs2, time2 - time1))
+        print('epoch [{},{}], {:.1f}s\n'.format(epoch, opt.epochs2, time2 - time1))
 
-        print()
         print(losses['train'])
         print(losses['valid'])
-        print()
 
+        if losses['valid'] < loss_valid_min:
+            save_model(model)
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'] )
+            loss_valid_min = np.copy(losses['valid'])
+            
     print('\n################## Evaluation ##################\n')
 
     losses, accuracy = eval(loaders['test'], model, criterion, opt)

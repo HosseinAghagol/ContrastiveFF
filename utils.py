@@ -162,3 +162,11 @@ def set_optimizers(model,opt):
     for l in range(opt.L):
         optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=opt.lr1))
     return optimizers
+
+
+def save_model(model):
+    torch.save(model.state_dict(), './save/model.pt')
+
+def load_model(model):
+    model.load_state_dict(torch.load('model.pt'))
+    return model
