@@ -186,19 +186,20 @@ def save_model(model, optimizers, epoch, loss_min):
     torch.save(state, './save/cp.pth')
 
 
-def load_model(model, optimizers):
+def load_model(model, optimizers=None):
     # Load the checkpoint
     checkpoint = torch.load('./save/cp.pth')
 
     # Restore the model state
     model.load_state_dict(checkpoint['model'])
+    optimizers, epoch, loss_min = None, None, None
+    if optimizers != None:
+        # Restore each optimizer's state
+        for l in range(len(optimizers)):
+            optimizers[l].load_state_dict(checkpoint['optimizer'][l])
 
-    # Restore each optimizer's state
-    for l in range(len(optimizers)):
-        optimizers[l].load_state_dict(checkpoint['optimizer'][l])
-
-    # Restore the epoch number
-    epoch = checkpoint['epoch']
-    loss_min = checkpoint['loss_min']
+        # Restore the epoch number
+        epoch = checkpoint['epoch']
+        loss_min = checkpoint['loss_min']
     
     return model, optimizers, epoch, loss_min
