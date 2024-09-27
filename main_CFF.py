@@ -170,7 +170,7 @@ def main():
 
         time2  = time.time()
         
-        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch-1, time2 - time1))
+        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
