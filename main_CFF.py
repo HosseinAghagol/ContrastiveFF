@@ -178,7 +178,9 @@ def main():
         if losses['valid'][-1] < loss_valid_min:
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1].item() )
             loss_valid_min = losses['valid'][-1].item()
-            save_model(model , optimizers, epoch, loss_valid_min)
+            torch.save(model.state_dict(), './save/model_best.pth')
+
+        save_model(model , optimizers, epoch, loss_valid_min)
 
 
     print('\n################## Training-Stage 2 ##################\n')
@@ -188,7 +190,8 @@ def main():
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
 
-    model, _, _,_ = load_model(model)
+    model.load_state_dict(torch.load('./save/model_best.pth'))
+
 
     loss_valid_min = np.inf
     for epoch in range(1, opt.epochs2 + 1):
@@ -215,10 +218,10 @@ def main():
         if losses['valid'] < loss_valid_min:
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'])
             loss_valid_min = losses['valid']
-            save_model(model , [optimizer], epoch, loss_valid_min)
+            torch.save(model.state_dict(), './save/model_best.pth')
             
     print('\n################## Evaluation ##################\n')
-    model, _, _,_ = load_model(model, [optimizer])
+    model.load_state_dict(torch.load('./save/model_best.pth'))
     losses, accuracy = eval(loaders['test'], model, criterion, opt)
     print(losses, accuracy)
 
