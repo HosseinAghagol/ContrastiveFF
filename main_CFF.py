@@ -176,7 +176,7 @@ def main():
         print(losses['valid'])
         
         if losses['valid'][-1] < loss_valid_min:
-            save_model(model)
+            save_model(model , optimizers, epoch)
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1].item() )
             loss_valid_min = losses['valid'][-1].item()
 
@@ -213,7 +213,7 @@ def main():
         print(losses['valid'])
 
         if losses['valid'] < loss_valid_min:
-            save_model(model , [optimizer], opt)
+            save_model(model , [optimizer], epoch)
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'])
             loss_valid_min = losses['valid']
             
