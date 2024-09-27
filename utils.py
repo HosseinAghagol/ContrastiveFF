@@ -192,7 +192,7 @@ def load_model(model, optimizers=None):
 
     # Restore the model state
     model.load_state_dict(checkpoint['model'])
-    optimizers, epoch, loss_min = None, None, None
+    epoch, loss_min = None, None
     if optimizers != None:
         # Restore each optimizer's state
         for l in range(len(optimizers)):

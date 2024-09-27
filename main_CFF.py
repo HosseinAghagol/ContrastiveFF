@@ -188,7 +188,7 @@ def main():
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
 
-    model, _, _,_ = load_model(model, [optimizer])
+    model, _, _,_ = load_model(model)
 
     loss_valid_min = np.inf
     for epoch in range(1, opt.epochs2 + 1):
