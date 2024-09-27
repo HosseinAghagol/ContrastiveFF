@@ -175,5 +175,5 @@ def save_model(model):
     torch.save(model.state_dict(), './save/model.pt')
 
 def load_model(model):
-    model.load_state_dict(torch.load('model.pt'))
+    model.load_state_dict(torch.load('./save/model.pt'))
     return model
