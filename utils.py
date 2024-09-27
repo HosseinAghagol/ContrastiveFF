@@ -43,6 +43,7 @@ def parse_option():
     parser.add_argument('--randaug', action='store_true', help='')
 
     parser.add_argument('--resume', action='store_true', help='')
+    
 
     # parser.add_argument('--print_freq', type=int, default=10,
     #                     help='print frequency')
