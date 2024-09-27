@@ -149,7 +149,7 @@ def main():
     
     first_epoch = 1
     if opt.resume:
-        model, optimizers, first_epoch = load_model(model, [optimizer], checkpoint_path='./save/cp.pth')
+        model, optimizers, first_epoch = load_model(model, optimizers, checkpoint_path='./save/cp.pth')
 
     # training routine
     print('\n################## Training-Stage 1 ##################\n')
