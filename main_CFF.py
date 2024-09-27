@@ -169,8 +169,8 @@ def main():
         losses['valid'] = one_epoch_stage1(x_valid, y_valid, transforms, model, criterions, optimizers, opt, phase='valid')
 
         time2  = time.time()
-
-        print('epoch [{},{}], {:.1f}s\n'.format(epoch, opt.epochs1, time2 - time1))
+        
+        print('--------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
@@ -190,7 +190,7 @@ def main():
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
 
-    model.load_state_dict(torch.load('./save/model_best.pth'))
+    model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
 
 
     loss_valid_min = np.inf
@@ -221,7 +221,7 @@ def main():
             torch.save(model.state_dict(), './save/model_best.pth')
             
     print('\n################## Evaluation ##################\n')
-    model.load_state_dict(torch.load('./save/model_best.pth'))
+    model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
     losses, accuracy = eval(loaders['test'], model, criterion, opt)
     print(losses, accuracy)
 

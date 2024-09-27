@@ -188,7 +188,7 @@ def save_model(model, optimizers, epoch, loss_min):
 
 def load_model(model, optimizers):
     # Load the checkpoint
-    checkpoint = torch.load('./save/cp.pth')
+    checkpoint = torch.load('./save/cp.pth', weights_only=True)
 
     # Restore the model state
     model.load_state_dict(checkpoint['model'])
