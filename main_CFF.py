@@ -154,7 +154,7 @@ def main():
     # training routine
     print('\n################## Training-Stage 1 ##################\n')
     # Stage 1 
-    for epoch in range(first_epoch, opt.epochs1 + first_epoch):
+    for epoch in range(first_epoch, opt.epochs1 + first_epoch-1):
         losses = {'train':0,'valid':0}
         # train for one epoch
 
@@ -170,7 +170,7 @@ def main():
 
         time2  = time.time()
         
-        print('--------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch, time2 - time1))
+        print('--------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs1 + first_epoch-1, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
