@@ -153,6 +153,7 @@ def main():
 
     # training routine
     print('\n################## Training-Stage 1 ##################\n')
+    print('saaaaaaaaaaaaaalaaaaam')
     # Stage 1 
     for epoch in range(first_epoch+1, opt.epochs1 + first_epoch):
         losses = {'train':0,'valid':0}
