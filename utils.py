@@ -107,13 +107,13 @@ def parse_option():
     return opt
 
 
-class TwoCropTransform:
-    """Create two crops of the same image"""
-    def __init__(self, transform):
-        self.transform = transform
+# class TwoCropTransform:
+#     """Create two crops of the same image"""
+#     def __init__(self, transform):
+#         self.transform = transform
 
-    def __call__(self, x):
-        return [self.transform(x), self.transform(x)]
+#     def __call__(self, x):
+#         return [v2.ToImage()(x), v2.ToImage()(x)]
         
 def set_loaders(opt):
     valid_size = 0.1
@@ -121,7 +121,6 @@ def set_loaders(opt):
     train_transform = transforms.Compose([
         v2.RandomCrop(32, padding=4),
         v2.RandomHorizontalFlip(),
-        v2.ToImage(),
         v2.ToDtype(torch.float32, scale=True),
         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
@@ -132,7 +131,7 @@ def set_loaders(opt):
         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
-    train_dataset  = datasets.CIFAR10('./data/',train=True,transform=TwoCropTransform(train_transform),download=True)
+    train_dataset  = datasets.CIFAR10('./data/',train=True,transform=v2.ToImage(),download=True)
     test_dataset   = datasets.CIFAR10('./data/',train=False,transform=test_transform,download=True)
 
     opt.patch_size  = 4
@@ -151,18 +150,26 @@ def set_loaders(opt):
     train_sampler = SubsetRandomSampler(train_idx)
     valid_sampler = SubsetRandomSampler(valid_idx)
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=opt.batch_size, pin_memory=True, sampler=train_sampler)
-    valid_loader = torch.utils.data.DataLoader(train_dataset, batch_size=opt.batch_size, pin_memory=True, sampler=valid_sampler)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=len(train_idx), pin_memory=True, sampler=train_sampler)
+    valid_loader = torch.utils.data.DataLoader(train_dataset, batch_size=len(valid_idx), pin_memory=True, sampler=valid_sampler)
     test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False)
 
-    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}
+    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}, {'train': train_transform, 'valid':test_transform}
+
+def load_data_on_ram(loader):
+
+    temp = next(iter(loader))
+
+    x = temp[0]
+    y = temp[1]
+
+    return x, y
 
 def set_optimizers(model,opt):
     optimizers = []
     for l in range(opt.L):
         optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=opt.lr1))
     return optimizers
-
 
 def save_model(model):
     torch.save(model.state_dict(), './save/model.pt')

@@ -11,24 +11,29 @@ import matplotlib.pyplot as plt
 from utils import parse_option
 from utils import set_optimizers
 from utils import save_model,load_model
-from utils import set_loaders
+from utils import set_loaders, load_data_on_ram
 
 from models.vit import ViT
 from losses import SupMCon
 
 
-def one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='train'):
-    model.train() if phase=='train' else model.eval()
+def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase='train'):
+    
 
     losses = torch.zeros(opt.L)
     n      = 0
-
+    
+    model.train() if phase=='train' else model.eval()
     torch.set_grad_enabled(True if phase=='train' else False)
-    for batch in loaders[phase]:
-        if opt.one_forward: x1 = batch[0].to('cuda')
-        else: x1,x2 = batch[0][0].to('cuda'),batch[0][1].to('cuda')
+    for i in tqdm(range(len(y)//opt.batch_size+1)):
 
-        targets = batch[1].to('cuda')
+        if opt.one_forward:
+            x1 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size])
+        else:
+            x1, x2 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda'), transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda')
+
+        targets = y[i*opt.batch_size:(i+1)*opt.batch_size].to('cuda')
+
 
         n += len(targets)
 
@@ -54,17 +59,16 @@ def one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='train')
 
 
 
-def one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train'):
-    model.train() if phase=='train' else model.eval()
-
+def one_epoch_stage2(x, y, transforms, model, criterion, optimizer, opt, phase='train'):
     losses = 0
     n      = 0
 
-    
-    for batch in loaders[phase]:
+    model.train() if phase=='train' else model.eval()
+    torch.set_grad_enabled(True if phase=='train' else False)
+    for i in tqdm(range(len(y)//opt.batch_size+1)):
 
-        features = batch[0][0].to('cuda')
-        targets  = batch[1].to('cuda')
+        features = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda')
+        targets  = y[i*opt.batch_size:(i+1)*opt.batch_size].to('cuda')
 
         n += len(targets)
 
@@ -128,7 +132,10 @@ def main():
     
     # build data loader
     print('\n################## Preparing data ##################\n')
-    loaders = set_loaders(opt)
+    loaders, transforms = set_loaders(opt)
+    
+    x_train,y_train = load_data_on_ram(loaders['train'])
+    x_valid,y_valid = load_data_on_ram(loaders['valid'])
 
     # build model and criterion
     model = ViT(opt).to('cuda')
@@ -147,10 +154,16 @@ def main():
     for epoch in range(1, opt.epochs1 + 1):
         losses = {'train':0,'valid':0}
         # train for one epoch
+
+        indices = torch.randperm(len(y_train))
+        x_train, y_train = x_train[indices], y_train[indices]
+        indices = torch.randperm(len(y_valid))
+        x_valid, y_valid = x_valid[indices], y_valid[indices]
+
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage1(loaders, model, criterions, optimizers, opt, phase='valid')
+        losses['train'] = one_epoch_stage1(x_train, y_train, transforms, model, criterions, optimizers, opt, phase='train')
+        losses['valid'] = one_epoch_stage1(x_valid, y_valid, transforms, model, criterions, optimizers, opt, phase='valid')
 
         time2  = time.time()
 
@@ -175,11 +188,17 @@ def main():
     loss_valid_min = np.inf
     for epoch in range(1, opt.epochs2 + 1):
         losses = {'train':0,'valid':0}
+
+        indices = torch.randperm(len(y_train))
+        x_train, y_train = x_train[indices], y_train[indices]
+        indices = torch.randperm(len(y_valid))
+        x_valid, y_valid = x_valid[indices], y_valid[indices]
+
         # train for one epoch
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='train')
-        losses['valid'] = one_epoch_stage2(loaders, model, criterion, optimizer, opt, phase='valid')
+        losses['train'] = one_epoch_stage2(x_train, y_train, transforms, model, criterion, optimizer, opt, phase='train')
+        losses['valid'] = one_epoch_stage2(x_valid, y_valid, transforms, model, criterion, optimizer, opt, phase='valid')
 
         time2  = time.time()
 
