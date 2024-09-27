@@ -25,7 +25,7 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
     
     model.train() if phase=='train' else model.eval()
     torch.set_grad_enabled(True if phase=='train' else False)
-    for i in tqdm(range(len(y)//opt.batch_size+1)):
+    for i in range(len(y)//opt.batch_size+1):
 
         if opt.one_forward:
             x1 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size])
@@ -65,7 +65,7 @@ def one_epoch_stage2(x, y, transforms, model, criterion, optimizer, opt, phase='
 
     model.train() if phase=='train' else model.eval()
     torch.set_grad_enabled(True if phase=='train' else False)
-    for i in tqdm(range(len(y)//opt.batch_size+1)):
+    for i in range(len(y)//opt.batch_size+1):
 
         features = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda')
         targets  = y[i*opt.batch_size:(i+1)*opt.batch_size].to('cuda')
@@ -174,8 +174,8 @@ def main():
         
         if losses['valid'][-1] < loss_valid_min:
             save_model(model)
-            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1] )
-            loss_valid_min = np.copy(losses['valid'][-1])
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1].item() )
+            loss_valid_min = losses['valid'][-1].item()
 
 
     print('\n################## Training-Stage 2 ##################\n')
@@ -209,13 +209,13 @@ def main():
 
         if losses['valid'] < loss_valid_min:
             save_model(model)
-            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'] )
-            loss_valid_min = np.copy(losses['valid'])
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'].item() )
+            loss_valid_min = losses['valid'].item()
             
     print('\n################## Evaluation ##################\n')
 
     losses, accuracy = eval(loaders['test'], model, criterion, opt)
-    print(losses, accuracy)
+    print(losses.item(), accuracy)
 
 if __name__ == '__main__':
     main()
