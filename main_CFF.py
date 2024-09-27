@@ -210,7 +210,7 @@ def main():
         if losses['valid'] < loss_valid_min:
             save_model(model)
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'])
-            loss_valid_min = losses['valid'].item()
+            loss_valid_min = losses['valid']
             
     print('\n################## Evaluation ##################\n')
 
