@@ -147,11 +147,14 @@ def main():
 
     loss_valid_min = np.inf
     
+    first_epoch = 1
+    if opt.resume:
+        model, optimizers, first_epoch = load_model(model, [optimizer], checkpoint_path='./save/cp.pth')
 
     # training routine
     print('\n################## Training-Stage 1 ##################\n')
     # Stage 1 
-    for epoch in range(1, opt.epochs1 + 1):
+    for epoch in range(first_epoch, opt.epochs1 + first_epoch):
         losses = {'train':0,'valid':0}
         # train for one epoch
 
@@ -181,9 +184,11 @@ def main():
     print('\n################## Training-Stage 2 ##################\n')
     # Stage 2
 
-    model     = load_model(model)
+    
     optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
+
+    model, _, _ = load_model(model, [optimizer], checkpoint_path='./save/cp.pth')
 
     loss_valid_min = np.inf
     for epoch in range(1, opt.epochs2 + 1):
@@ -208,7 +213,7 @@ def main():
         print(losses['valid'])
 
         if losses['valid'] < loss_valid_min:
-            save_model(model)
+            save_model(model , [optimizer], opt)
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'])
             loss_valid_min = losses['valid']
             

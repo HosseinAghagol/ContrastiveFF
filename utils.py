@@ -42,6 +42,8 @@ def parse_option():
 
     parser.add_argument('--randaug', action='store_true', help='')
 
+    parser.add_argument('--continue', action='store_true', help='')
+
     # parser.add_argument('--print_freq', type=int, default=10,
     #                     help='print frequency')
     # parser.add_argument('--save_freq', type=int, default=50,
@@ -174,9 +176,27 @@ def set_optimizers(model,opt):
         optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=opt.lr1))
     return optimizers
 
-def save_model(model):
-    torch.save(model.state_dict(), './save/model.pt')
+def save_model(model, optimizers, epoch):
+    state = {
+        'model': model.state_dict(),
+        'optimizer': [optimizers[l].state_dict() for l in range(len(optimizers))],
+        'epoch': epoch,
+    }
+    torch.save(state, './save/cp.pth')
 
-def load_model(model):
-    model.load_state_dict(torch.load('./save/model.pt'))
-    return model
+
+def load_model(model, optimizers, checkpoint_path='./save/cp.pth'):
+    # Load the checkpoint
+    checkpoint = torch.load(checkpoint_path)
+
+    # Restore the model state
+    model.load_state_dict(checkpoint['model'])
+
+    # Restore each optimizer's state
+    for l in range(len(optimizers)):
+        optimizers[l].load_state_dict(checkpoint['optimizer'][l])
+
+    # Restore the epoch number
+    epoch = checkpoint['epoch']
+    
+    return model, optimizers, epoch
