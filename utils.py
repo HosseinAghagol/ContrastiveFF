@@ -176,18 +176,19 @@ def set_optimizers(model,opt):
         optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=opt.lr1))
     return optimizers
 
-def save_model(model, optimizers, epoch):
+def save_model(model, optimizers, epoch, loss_min):
     state = {
         'model': model.state_dict(),
         'optimizer': [optimizers[l].state_dict() for l in range(len(optimizers))],
         'epoch': epoch,
+        'loss_min':loss_min
     }
     torch.save(state, './save/cp.pth')
 
 
-def load_model(model, optimizers, checkpoint_path='./save/cp.pth'):
+def load_model(model, optimizers):
     # Load the checkpoint
-    checkpoint = torch.load(checkpoint_path)
+    checkpoint = torch.load('./save/cp.pth')
 
     # Restore the model state
     model.load_state_dict(checkpoint['model'])
@@ -198,5 +199,6 @@ def load_model(model, optimizers, checkpoint_path='./save/cp.pth'):
 
     # Restore the epoch number
     epoch = checkpoint['epoch']
+    loss_min = checkpoint['loss_min']
     
-    return model, optimizers, epoch
+    return model, optimizers, epoch, loss_min
