@@ -34,11 +34,13 @@ def parse_option():
     
     parser.add_argument('--temp', type=float, default=0.15, help='temperature for contrastive loss function')
 
-    parser.add_argument('--one_forward', action='store_true', help='')\
+    parser.add_argument('--one_forward', action='store_true', help='')
     
     parser.add_argument('--m0', type=float, default=0.4, help='')
     
     parser.add_argument('--mL', type=float, default=0.1, help='')
+
+    parser.add_argument('--randaug', action='store_true', help='')
 
     # parser.add_argument('--print_freq', type=int, default=10,
     #                     help='print frequency')
@@ -117,13 +119,14 @@ def parse_option():
         
 def set_loaders(opt):
     valid_size = 0.1
-
-    train_transform = transforms.Compose([
-        v2.RandomCrop(32, padding=4),
-        v2.RandomHorizontalFlip(),
-        v2.ToDtype(torch.float32, scale=True),
-        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ])
+    train_transform = []
+    if opt.randaug: train_transform.append(v2.RandAugment(2,14))
+    train_transform.extend([v2.RandomCrop(32, padding=4),
+                            v2.RandomHorizontalFlip(),
+                            v2.ToDtype(torch.float32, scale=True),
+                            v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+    
+    train_transform = transforms.Compose(train_transform)
 
     test_transform = transforms.Compose([
         v2.ToImage(),

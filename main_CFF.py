@@ -209,13 +209,13 @@ def main():
 
         if losses['valid'] < loss_valid_min:
             save_model(model)
-            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'].item() )
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'])
             loss_valid_min = losses['valid'].item()
             
     print('\n################## Evaluation ##################\n')
 
     losses, accuracy = eval(loaders['test'], model, criterion, opt)
-    print(losses.item(), accuracy)
+    print(losses, accuracy)
 
 if __name__ == '__main__':
     main()
