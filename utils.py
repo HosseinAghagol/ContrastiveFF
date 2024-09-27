@@ -127,7 +127,6 @@ def set_loaders(opt):
     train_transform = []
     if opt.randaug: train_transform.append(v2.RandAugment(2,14))
     train_transform.extend([v2.RandomCrop(32, padding=4),
-                            v2.RandomHorizontalFlip(),
                             v2.ToDtype(torch.float32, scale=True),
                             v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     
