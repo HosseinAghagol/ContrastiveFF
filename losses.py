@@ -17,7 +17,7 @@ class SupMCon(nn.Module):
         labels = labels.contiguous().view(-1, 1)
         mask   = torch.eq(labels, labels.T).float().to(device)
 
-        n = len(features[0])
+        n = features[0].shape[1]
         count = 2
 
         contrast_feature = torch.cat(features, dim=0)
