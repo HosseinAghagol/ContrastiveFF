@@ -138,6 +138,7 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
+    print(model.layers[0].named_parameters())
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
