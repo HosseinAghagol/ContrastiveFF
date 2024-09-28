@@ -26,7 +26,7 @@ def parse_option():
     
     parser.add_argument('--L', type=int, default=6, help='')
 
-    # parser.add_argument('--patch_size', type=int, default=4, help='')
+    parser.add_argument('--patch_size', type=int, default=4, help='')
     
     parser.add_argument('--lr1', type=float, default=0.004, help='learning rate stage 1')
 
@@ -127,6 +127,7 @@ def set_loaders(opt):
     train_transform = []
     if opt.randaug: train_transform.append(v2.RandAugment(2,14))
     train_transform.extend([v2.RandomCrop(32, padding=4),
+                            v2.RandomHorizontalFlip(),
                             v2.ToDtype(torch.float32, scale=True),
                             v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     
@@ -148,7 +149,6 @@ def set_loaders(opt):
     # obtain training indices that will be used for validation
     num_train = len(train_dataset)
     indices   = list(range(num_train))
-    np.random.seed(0)
     np.random.shuffle(indices)
     split = int(np.floor(valid_size * num_train))
     train_idx, valid_idx = indices[split:], indices[:split]
