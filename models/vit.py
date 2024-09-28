@@ -80,6 +80,7 @@ class ViTEncoder(nn.Module):
     def forward(self, x):
         if x.shape[0] ==512:
             x = x.transpose(0, 1)
+        print(x.shape)
         out = self.norm1(x)
         out, _ = self.attn(out, out, out)
 
