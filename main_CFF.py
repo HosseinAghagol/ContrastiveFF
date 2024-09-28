@@ -45,7 +45,9 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
             else: 
                 x1 = model.layers[l](x1.detach())
                 x2 = model.layers[l](x2.detach())
-                loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+                x12 = torch.cat([x1.mean(1).unsqueeze(1), x2.mean(1).unsqueeze(1)], dim=1)
+                loss = criterions[l](x12, targets)
+                # loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
 
 
             if phase=='train':
