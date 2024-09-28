@@ -9,7 +9,6 @@ class SupMCon(nn.Module):
         super(SupMCon, self).__init__()
         self.temperature     = opt.temp
         self.positive_margin = positive_margin
-        self.one_forward     = opt.one_forward
 
     def forward(self, features, labels=None):
         device = 'cuda'
@@ -21,7 +20,7 @@ class SupMCon(nn.Module):
         count = 2
 
         contrast_feature = torch.cat(features, dim=0)
-    
+        anchor_feature = contrast_feature
 
         # tile mask
         mask = mask.repeat(count, count)
@@ -36,8 +35,8 @@ class SupMCon(nn.Module):
 
         mask = mask * logits_mask
         # compute logits
+        anchor_feature   = F.normalize(anchor_feature)
         contrast_feature = F.normalize(contrast_feature)
-        anchor_feature   = contrast_feature
 
         anchor_dot_contrast = torch.matmul(anchor_feature, contrast_feature.T)
         anchor_dot_contrast = torch.where(mask == 1,

@@ -34,19 +34,18 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
 
         targets = y[i*opt.batch_size:(i+1)*opt.batch_size].to('cuda')
 
-
         n += len(targets)
 
         for l in range(opt.L):
 
             if opt.one_forward:
                 x1 = model.layers[l](x1.detach())
-                loss = criterions[l]([x1.mean(0)], targets)
+                loss = criterions[l]([x1.mean(1)], targets)
 
             else: 
                 x1 = model.layers[l](x1.detach())
                 x2 = model.layers[l](x2.detach())
-                loss = criterions[l]([x1.mean(0),x2.mean(0)], targets)
+                loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
 
 
             if phase=='train':
@@ -80,7 +79,7 @@ def one_epoch_stage2(x, y, transforms, model, criterion, optimizer, opt, phase='
         # Classifier head
         model.train() if phase=='train' else model.eval()
         torch.set_grad_enabled(True if phase=='train' else False)
-        outputs = model.classifier_head(features.mean(0).detach())
+        outputs = model.classifier_head(features.mean(1).detach())
         loss   = criterion(outputs, targets)
 
         if phase=='train':
@@ -112,7 +111,7 @@ def eval(test_loader, model, criterion, opt):
         # Extracting feature
         for l in range(opt.L): features = model.layers[l](features)
         # Classifier head
-        output = model.classifier_head(features.mean(0))
+        output = model.classifier_head(features.mean(1))
 
         loss   = criterion(output, targets)
         
@@ -138,14 +137,12 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-    for name, _ in model.layers[0].named_parameters():
-        print(name)
+
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
     if opt.non_linear_m:
         positive_margin = opt.mL + (opt.m0 - opt.mL) * (np.exp(-5 * np.linspace(0, 1, opt.L)))
-    print(positive_margin)
     criterions = [SupMCon(opt, positive_margin[l]) for l in range(len(model.layers))]
 
     loss_valid_min = np.inf
@@ -177,7 +174,7 @@ def main():
 
         print(losses['train'])
         print(losses['valid'])
-        
+
         if losses['valid'][-1] < loss_valid_min:
             print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1].item() )
             loss_valid_min = losses['valid'][-1].item()
