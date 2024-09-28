@@ -64,7 +64,14 @@ class PositionalEncoder(nn.Module):
 
     def forward(self, x):
         return x + self.pos_embed
+class Transpose(nn.Module):
+    
+    def __init__(self,opt):
+        super().__init__()
 
+    def forward(self, x):
+        return x.transpose(0,1)
+    
 class ViTEncoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_heads, dropout=0.0):
         super().__init__()
@@ -78,8 +85,6 @@ class ViTEncoder(nn.Module):
         self.drop2 = nn.Dropout(dropout)
 
     def forward(self, x):
-        if x.shape[0] ==512:
-            x = x.transpose(0, 1)
         out = self.norm1(x)
         out, _ = self.attn(out, out, out)
 
@@ -111,6 +116,7 @@ class ViT(nn.Module):
           PatchingLayer(opt),
           nn.Linear(3*(opt.patch_size**2), opt.E),
           PositionalEncoder(opt),
+          Transpose(),
           ViTEncoder(opt.E, opt.E, opt.H)
         ))
         # self.layers = nn.ModuleList([PatchingLayer(opt), nn.Linear(3*(opt.patch_size**2), opt.E), PositionalEncoder(opt), ViTEncoder(opt.E, opt.E, opt.H)])
