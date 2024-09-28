@@ -108,6 +108,7 @@ class ViT(nn.Module):
         self.layers.append(nn.Sequential(
           PatchingLayer(opt),
           nn.Linear(3*(opt.patch_size**2), opt.E),
+          nn.ReLU(),
           PositionalEncoder(opt),
           ViTEncoder(opt.E, opt.E, opt.H)
         ))
