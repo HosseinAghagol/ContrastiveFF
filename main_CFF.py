@@ -166,7 +166,7 @@ def main():
         time1  = time.time()
 
         losses['train'] = one_epoch_stage1(x_train, y_train, transforms, model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage1(x_valid, y_valid, transforms, model, criterions, optimizers, opt, phase='valid')
+        # losses['valid'] = one_epoch_stage1(x_valid, y_valid, transforms, model, criterions, optimizers, opt, phase='valid')
 
         time2  = time.time()
         
