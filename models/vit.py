@@ -66,7 +66,7 @@ class PositionalEncoder(nn.Module):
         return x + self.pos_embed
 class Transpose(nn.Module):
     
-    def __init__(self,opt):
+    def __init__(self):
         super().__init__()
 
     def forward(self, x):
