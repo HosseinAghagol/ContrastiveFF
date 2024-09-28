@@ -41,7 +41,7 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
 
             if opt.one_forward:
                 x1 = model.layers[l](x1.detach())
-                loss = criterions[l]([x1], targets)
+                loss = criterions[l]([x1.mean(1)], targets)
 
             else: 
                 x1 = model.layers[l](x1.detach())
@@ -93,9 +93,6 @@ def one_epoch_stage2(x, y, transforms, model, criterion, optimizer, opt, phase='
     return losses/n
 
 
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
 def eval(test_loader, model, criterion, opt):
 
     model.eval()
@@ -141,7 +138,6 @@ def main():
 
     # build model and criterion
     model = ViT(opt).to('cuda')
-    print(count_parameters(model))
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
