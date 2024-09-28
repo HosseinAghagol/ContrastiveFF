@@ -25,15 +25,15 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
     
     model.train() if phase=='train' else model.eval()
     torch.set_grad_enabled(True if phase=='train' else False)
-    for i in range(len(y)//opt.batch_size+1):
 
+    for i in range(len(y)//opt.batch_size+1):
+        
         if opt.one_forward:
             x1 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size])
         else:
             x1, x2 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda'), transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size]).to('cuda')
 
         targets = y[i*opt.batch_size:(i+1)*opt.batch_size].to('cuda')
-
         n += len(targets)
 
         for l in range(opt.L):
