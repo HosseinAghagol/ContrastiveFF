@@ -27,7 +27,6 @@ def one_epoch_stage1(x, y, transforms, model, criterions, optimizers, opt, phase
     torch.set_grad_enabled(True if phase=='train' else False)
 
     for i in range(len(y)//opt.batch_size+1):
-        
         if opt.one_forward:
             x1 = transforms[phase](x[i*opt.batch_size:(i+1)*opt.batch_size])
         else:
@@ -159,14 +158,14 @@ def main():
         # train for one epoch
 
         indices = torch.randperm(len(y_train))
-        x_train, y_train = x_train[indices], y_train[indices]
+        x_train_, y_train_ = x_train[indices], y_train[indices]
         indices = torch.randperm(len(y_valid))
-        x_valid, y_valid = x_valid[indices], y_valid[indices]
+        x_valid_, y_valid_ = x_valid[indices], y_valid[indices]
 
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage1(x_train, y_train, transforms, model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage1(x_valid, y_valid, transforms, model, criterions, optimizers, opt, phase='valid')
+        losses['train'] = one_epoch_stage1(x_train_, y_train_, transforms, model, criterions, optimizers, opt, phase='train')
+        losses['valid'] = one_epoch_stage1(x_valid_, y_valid_, transforms, model, criterions, optimizers, opt, phase='valid')
 
         time2  = time.time()
         
@@ -198,15 +197,15 @@ def main():
         losses = {'train':0,'valid':0}
 
         indices = torch.randperm(len(y_train))
-        x_train, y_train = x_train[indices], y_train[indices]
+        x_train_, y_train_ = x_train[indices], y_train[indices]
         indices = torch.randperm(len(y_valid))
-        x_valid, y_valid = x_valid[indices], y_valid[indices]
+        x_valid_, y_valid_ = x_valid[indices], y_valid[indices]
 
         # train for one epoch
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage2(x_train, y_train, transforms, model, criterion, optimizer, opt, phase='train')
-        losses['valid'] = one_epoch_stage2(x_valid, y_valid, transforms, model, criterion, optimizer, opt, phase='valid')
+        losses['train'] = one_epoch_stage2(x_train_, y_train_, transforms, model, criterion, optimizer, opt, phase='train')
+        losses['valid'] = one_epoch_stage2(x_valid_, y_valid_, transforms, model, criterion, optimizer, opt, phase='valid')
 
         time2  = time.time()
 

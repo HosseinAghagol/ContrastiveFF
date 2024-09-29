@@ -161,7 +161,7 @@ def set_loaders(opt):
     valid_loader = torch.utils.data.DataLoader(train_dataset, batch_size=len(valid_idx), pin_memory=True, sampler=valid_sampler)
     test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False)
 
-    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}, {'train': train_transform, 'valid':train_transform}
+    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}, {'train': train_transform, 'valid':test_loader}
 
 def load_data_on_ram(loader):
 
