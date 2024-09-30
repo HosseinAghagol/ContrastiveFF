@@ -131,7 +131,8 @@ def set_loaders(opt):
     #                         v2.ToDtype(torch.float32, scale=True),
     #                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     
-    train_transform = transforms.Compose([v2.RandAugment(3,14),
+    train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
+                                        transforms.RandomHorizontalFlip(),
                                         v2.ToDtype(torch.float32, scale=True),
                                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
