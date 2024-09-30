@@ -117,7 +117,7 @@ class ViT(nn.Module):
         self.layers.extend([ViTEncoder(opt.E, opt.E*2, opt.H) for _ in range(1,opt.L)])
             
         # Classification head
-        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E),
+        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E*2),
                                              nn.ReLU(),
                                              nn.Linear(opt.E, opt.num_class))
 
