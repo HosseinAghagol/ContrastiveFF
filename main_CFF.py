@@ -197,8 +197,8 @@ def main():
         # train for one epoch
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage2(loaders['train'], model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage2(loaders['valid'], model, criterions, optimizers, opt, phase='valid')
+        losses['train'] = one_epoch_stage2(loaders['train'], model, criterion, optimizer, opt, phase='train')
+        losses['valid'] = one_epoch_stage2(loaders['valid'], model, criterion, optimizer, opt, phase='valid')
 
         time2  = time.time()
 
