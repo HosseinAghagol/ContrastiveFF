@@ -144,19 +144,20 @@ class CustomTensorDataset(Dataset):
 def set_loaders(args):
     valid_size = 0.1
     train_transform = []
-    # if args.randaug: train_transform.append(v2.RandAugment(2,14))
-    # train_transform.extend([v2.RandomCrop(32, padding=4),
-    #                         v2.RandomHorizontalFlip(),
-    #                         v2.ToDtype(torch.float32, scale=True),
-    #                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+    if args.randaug: train_transform.append(v2.RandAugment(2,14))
+    train_transform.extend([v2.RandomCrop(32, padding=4),
+                            v2.RandomHorizontalFlip(),
+                            v2.ToDtype(torch.float32, scale=True),
+                            v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     
-    train_transform = transforms.Compose([
-                                        v2.RandomCrop(32, padding=4),
-                                        v2.RandomHorizontalFlip(),
-                                        v2.ToDtype(torch.float32, scale=True),
-                                        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-                                        ])
+    # train_transform = transforms.Compose([
+    #                                     v2.RandomCrop(32, padding=4),
+    #                                     v2.RandomHorizontalFlip(),
+    #                                     v2.ToDtype(torch.float32, scale=True),
+    #                                     v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+    #                                     ])
 
+    train_transform = transforms.Compose(train_transform)
     test_transform = transforms.Compose([
                                         v2.ToDtype(torch.float32, scale=True),
                                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
