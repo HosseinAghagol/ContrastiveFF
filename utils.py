@@ -169,9 +169,9 @@ def set_loaders(args):
     args.num_patches = int((32**2) / (args.patch_size**2))
     args.num_class   = 10
     
-    train_size = int(0.9 * len(train_dataset))
-    val_size   = len(train_dataset) - train_size
-    train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+    # train_size = int(0.9 * len(train_dataset))
+    # val_size   = len(train_dataset) - train_size
+    # train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
     if args.on_ram:
         print('loading data on ram')
@@ -181,8 +181,8 @@ def set_loaders(args):
         test_labels  = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
         indices = torch.randperm(len(train_data))
 
-        indices_train = indices[:int(0.9 * train_size)]
-        indices_valid = indices[int(0.9 * train_size):]
+        indices_train = indices[:int(0.9 * len(train_dataset))]
+        indices_valid = indices[int(0.9 * len(train_dataset)):]
         train_data   = train_data[indices_train]
         valid_data   = train_data[indices_valid]
         train_labels = train_labels[indices_train]
@@ -196,7 +196,7 @@ def set_loaders(args):
 
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size)
-    valid_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch_size)
     test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}
