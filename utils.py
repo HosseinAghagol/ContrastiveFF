@@ -183,8 +183,10 @@ def set_loaders(args):
 
         indices_train = indices[:int(0.9 * len(train_dataset))]
         indices_valid = indices[int(0.9 * len(train_dataset)):]
+        
         train_data   = train_data[indices_train]
         valid_data   = train_data[indices_valid]
+
         train_labels = train_labels[indices_train]
         valid_labels = train_labels[indices_valid]
 
