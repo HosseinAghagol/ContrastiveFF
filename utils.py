@@ -2,7 +2,7 @@ import os
 import argparse
 import torch
 import numpy as np
-from torch.utils.data import DataLoader
+from torch.utils.data import Dataset, DataLoader, TensorDataset, random_split
 from torchvision import datasets
 from torchvision import transforms
 from torchvision.transforms import v2
@@ -45,6 +45,8 @@ def parse_option():
     parser.add_argument('--resume', action='store_true', help='')
 
     parser.add_argument('--non_linear_m', action='store_true', help='')
+
+    parser.add_argument('--on_ram', action='store_true', help='')
     
 
     # parser.add_argument('--print_freq', type=int, default=10,
@@ -97,88 +99,121 @@ def parse_option():
     # parser.add_argument('--trial', type=str, default='0',
     #                     help='id for recording multiple runs')
 
-    opt = parser.parse_args()
+    args = parser.parse_args()
 
 
     # set the path according to the environment
 
-    opt.data_folder = './data/'
-    opt.model_path = './save/SupCon/{}_models'.format(opt.data)
+    args.data_folder = './data/'
+    args.model_path = './save/SupCon/{}_models'.format(args.data)
 
-    opt.model_name = 'CFF_{}_ViT_[{} {} {}]_lr_{}_bsz_{}_temp_{}_m0{}'.\
-        format('CFF', opt.data,'ViT',opt.E,opt.H,opt.L, opt.lr1, opt.batch_size, opt.temp, opt.m0)
+    args.model_name = 'CFF_{}_ViT_[{} {} {}]_lr_{}_bsz_{}_temp_{}_m0{}'.\
+        format('CFF', args.data,'ViT',args.E,args.H,args.L, args.lr1, args.batch_size, args.temp, args.m0)
 
     if not os.path.isdir('save'):
         os.makedirs('save')
         
-    return opt
+    return args
 
+def two_transform(x,transform):
+    return [transform(x), transform(x)]
+    
+class CustomTensorDataset(Dataset):
+    def __init__(self, X, y, transform=None, one_forward=True):
+        self.X = X
+        self.y = y
+        self.transform = transform
+        self.one_forward = one_forward
 
-# class TwoCropTransform:
-#     """Create two crops of the same image"""
-#     def __init__(self, transform):
-#         self.transform = transform
+    def __len__(self):
+        return len(self.X)
 
-#     def __call__(self, x):
-#         return [v2.ToImage()(x), v2.ToImage()(x)]
+    def __getitem__(self, idx):
+        image, label = self.X[idx], self.y[idx]
+
+        # Convert tensor to PIL Image for applying transformations
+        if self.one_forward:
+            image = self.transform(image)
+        else:
+            image = self.two_transform(image, self.transform)
+
+        return image, label
+    
+
         
-def set_loaders(opt):
+def set_loaders(args):
     valid_size = 0.1
     train_transform = []
-    # if opt.randaug: train_transform.append(v2.RandAugment(2,14))
+    # if args.randaug: train_transform.append(v2.RandAugment(2,14))
     # train_transform.extend([v2.RandomCrop(32, padding=4),
     #                         v2.RandomHorizontalFlip(),
     #                         v2.ToDtype(torch.float32, scale=True),
     #                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     
-    train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
-                                        transforms.RandomHorizontalFlip(),
+    train_transform = transforms.Compose([
+                                        v2.RandomCrop(32, padding=4),
+                                        v2.RandomHorizontalFlip(),
                                         v2.ToDtype(torch.float32, scale=True),
-                                        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+                                        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                        ])
 
     test_transform = transforms.Compose([
-        v2.ToImage(),
-        v2.ToDtype(torch.float32, scale=True),
-        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ])
+                                        v2.ToDtype(torch.float32, scale=True),
+                                        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+                                        ])
 
     train_dataset  = datasets.CIFAR10('./data/',train=True,transform=v2.ToImage(),download=True)
-    test_dataset   = datasets.CIFAR10('./data/',train=False,transform=test_transform,download=True)
+    test_dataset   = datasets.CIFAR10('./data/',train=False,transform=v2.ToImage(),download=True)
 
-    opt.patch_size  = 4
-    opt.num_patches = int((32**2) / (opt.patch_size**2))
-    opt.num_class   = 10
+    args.patch_size  = 4
+    args.num_patches = int((32**2) / (args.patch_size**2))
+    args.num_class   = 10
     
-    # obtain training indices that will be used for validation
-    num_train = len(train_dataset)
-    indices   = list(range(num_train))
-    np.random.shuffle(indices)
-    split = int(np.floor(valid_size * num_train))
-    train_idx, valid_idx = indices[split:], indices[:split]
+    train_size = int(0.9 * len(train_dataset))
+    val_size   = len(train_dataset) - train_size
+    train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
-    # define samplers for obtaining training and validation batches
-    train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
+    if args.on_ram:
+        print('loading data on ram')
+        train_data   = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+        train_labels = torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))])
+        test_data    = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
+        test_labels  = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+        indices = torch.randperm(len(train_data))
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=len(train_idx), pin_memory=True, sampler=train_sampler)
-    valid_loader = torch.utils.data.DataLoader(train_dataset, batch_size=len(valid_idx), pin_memory=True, sampler=valid_sampler)
-    test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=opt.batch_size, shuffle=False)
+        indices_train = indices[:int(0.9 * train_size)]
+        indices_valid = indices[int(0.9 * train_size):]
+        train_data   = train_data[indices_train]
+        valid_data   = train_data[indices_valid]
+        train_labels = train_labels[indices_train]
+        valid_labels = train_labels[indices_valid]
 
-    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}, {'train': train_transform, 'valid':train_transform}
+        train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform)
+        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=test_transform)
+        test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform)
 
-def load_data_on_ram(loader):
 
-    temp = next(iter(loader))
 
-    x = temp[0]
-    y = temp[1]
 
-    return x, y
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size)
+    valid_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size)
+    test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
-def set_optimizers(model,opt):
+    return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}
+
+# def load_data_on_ram(loader):
+
+#     temp = next(iter(loader))
+
+#     x = temp[0]
+#     y = temp[1]
+
+#     return x, y
+
+def set_optimizers(model,args):
     optimizers = []
-    for l in range(opt.L):
-        optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=opt.lr1))
+    for l in range(args.L):
+        optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=args.lr1))
     return optimizers
 
 def save_model(model, optimizers, epoch, loss_min):
