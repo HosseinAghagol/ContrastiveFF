@@ -119,7 +119,7 @@ def two_transform(x,transform):
     return [transform(x), transform(x)]
     
 class CustomTensorDataset(Dataset):
-    def __init__(self, X, y, transform=None, one_forward=True):
+    def __init__(self, X, y, transform, one_forward):
         self.X = X
         self.y = y
         self.transform = transform
@@ -135,7 +135,7 @@ class CustomTensorDataset(Dataset):
         if self.one_forward:
             image = self.transform(image)
         else:
-            image = self.two_transform(image, self.transform)
+            image = two_transform(image, self.transform)
 
         return image, label
     
@@ -181,18 +181,18 @@ def set_loaders(args):
         test_labels  = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
         indices = torch.randperm(len(train_data))
 
-        indices_train = indices[:int(0.9 * len(train_dataset))]
-        indices_valid = indices[int(0.9 * len(train_dataset)):]
-        
-        train_data   = train_data[indices_train]
+        indices_train = indices[:int(0.9 * len(train_data))]
+        indices_valid = indices[int(0.9 * len(train_data)):]
+
         valid_data   = train_data[indices_valid]
-
-        train_labels = train_labels[indices_train]
+        train_data   = train_data[indices_train]
+        
         valid_labels = train_labels[indices_valid]
+        train_labels = train_labels[indices_train]
 
-        train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform)
-        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=test_transform)
-        test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform)
+        train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
+        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=test_transform, one_forward=args.one_forward)
+        test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=False)
 
 
 
