@@ -33,15 +33,7 @@ class PatchingLayer(nn.Module):
 
 
     def forward(self, x):
-        '''Transforms image into list of patches of the specified dimensions
-        Args:
-            x (Tensor): Tensor of dimensions B x C x H x W, representing a batch.
-            B=Batch size, C=Channel count.
-            patch_size (int): Size of one side of (square) patch.
-        Returns:
-            patch_seq (Tensor): List of patches of dimension B x N x [C * P ** 2],
-            where N is the number of patches and P is patch_size.
-        '''
+
 
         B, C, H, W = x.shape
 
@@ -110,16 +102,16 @@ class ViT(nn.Module):
           nn.Linear(3*(opt.patch_size**2), opt.E),
           nn.ReLU(),
           PositionalEncoder(opt),
-          ViTEncoder(opt.E, opt.E*2, opt.H)
+          ViTEncoder(opt.E, opt.E, opt.H)
         ))
         
         # Another layers
-        self.layers.extend([ViTEncoder(opt.E, opt.E*2, opt.H) for _ in range(1,opt.L)])
+        self.layers.extend([ViTEncoder(opt.E, opt.E, opt.H) for _ in range(1,opt.L)])
             
         # Classification head
-        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E*2),
+        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E),
                                              nn.ReLU(),
-                                             nn.Linear(opt.E*2, opt.num_class))
+                                             nn.Linear(opt.E, opt.num_class))
 
     def forward(self, x):
         # Encoding
