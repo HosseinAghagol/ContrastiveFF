@@ -69,7 +69,7 @@ class ViTEncoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_heads, dropout=0.0):
         super().__init__()
         self.norm1 = nn.LayerNorm(input_dim)
-        self.attn  = nn.MultiheadAttention(input_dim, num_heads)
+        self.attn  = nn.MultiheadAttention(input_dim, num_heads, batch_first=True)
         self.norm2 = nn.LayerNorm(input_dim)
         self.fc1   = nn.Linear(input_dim, hidden_dim)
         self.act   = nn.GELU()
