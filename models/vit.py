@@ -20,7 +20,7 @@ def img_to_patch(x, patch_size):
     # reshape to B x C x H_count x H_patch x W_count x W_patch
     x = x.reshape(B, C, H // patch_size, patch_size, W // patch_size, patch_size)
     x = x.permute(0, 2, 4, 1, 3, 5)
-    x = x.flatten(1,2)
+    x = x.flatten(1, 2)
     x = x.flatten(2, 4)
 
     return x
