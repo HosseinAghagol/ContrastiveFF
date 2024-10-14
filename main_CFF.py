@@ -106,9 +106,7 @@ def eval(test_loader, model, criterion, opt):
     torch.set_grad_enabled(False)
     for batch in test_loader:
 
-        if opt.one_forward: features = batch[0].to('cuda')
-        else: features = batch[0][0].to('cuda')
-
+        features = batch[0].to('cuda')
         targets = batch[1].to('cuda')
 
         n += len(targets)
