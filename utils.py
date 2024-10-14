@@ -115,9 +115,7 @@ def parse_option():
         
     return args
 
-def two_transform(x,transform):
-    return [transform(x), transform(x)]
-    
+
 class CustomTensorDataset(Dataset):
     def __init__(self, X, y, transform, one_forward):
         self.X = X
@@ -135,7 +133,7 @@ class CustomTensorDataset(Dataset):
         if self.one_forward:
             image = self.transform(image)
         else:
-            image = two_transform(image, self.transform)
+            image = [self.transform(image), self.transform(image)]
 
         return image, label
     
@@ -192,7 +190,7 @@ def set_loaders(args):
         train_labels = train_labels[indices_train]
 
         train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
-        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=test_transform, one_forward=args.one_forward)
+        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=train_transform, one_forward=args.one_forward)
         test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=False)
 
 
