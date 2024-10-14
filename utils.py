@@ -191,7 +191,7 @@ def set_loaders(args):
 
         train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
         valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=train_transform, one_forward=args.one_forward)
-        test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=False)
+        test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=True)
 
 
 
