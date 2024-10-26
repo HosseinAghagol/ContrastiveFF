@@ -58,7 +58,7 @@ class PositionalEncoder(nn.Module):
         return x + self.pos_embed
 
 class ViTEncoder(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_heads, dropout=0.0):
+    def __init__(self, input_dim, hidden_dim, num_heads, dropout=0.1):
         super().__init__()
         self.norm1 = nn.LayerNorm(input_dim)
         self.attn  = nn.MultiheadAttention(input_dim, num_heads, batch_first=True)
