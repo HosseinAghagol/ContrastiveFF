@@ -21,7 +21,7 @@ class SupMCon(nn.Module):
         n = features[0].shape[0]
         count = 2
 
-        contrast_feature = torch.cat(features, dim=0)
+        contrast_feature = F.normalize(torch.cat(features, dim=0))
         anchor_feature = contrast_feature
 
         # tile mask
@@ -37,8 +37,6 @@ class SupMCon(nn.Module):
 
         mask = mask * logits_mask
         # compute logits
-        anchor_feature   = F.normalize(anchor_feature)
-        contrast_feature = F.normalize(contrast_feature)
 
         anchor_dot_contrast = torch.matmul(anchor_feature, contrast_feature.T)
         anchor_dot_contrast = torch.where(mask == 1,
