@@ -102,16 +102,15 @@ class ViT(nn.Module):
           nn.Linear(3*(opt.patch_size**2), opt.E),
           nn.ReLU(),
           PositionalEncoder(opt),
-          ViTEncoder(opt.E, opt.E, opt.H)
+          ViTEncoder(opt.E, opt.E*2, opt.H)
         ))
         
         # Another layers
-        self.layers.extend([ViTEncoder(opt.E, opt.E, opt.H) for _ in range(1,opt.L)])
+        self.layers.extend([ViTEncoder(opt.E, opt.E*2, opt.H) for _ in range(1,opt.L)])
             
         # Classification head
-        self.classifier_head = nn.Sequential(nn.Linear(opt.E, opt.E),
-                                             nn.ReLU(),
-                                             nn.Linear(opt.E, opt.num_class))
+        self.classifier_head = nn.Sequential(nn.LayerNorm(opt.E),
+                                             nn.Linear(opt.E, 10))
 
     def forward(self, x):
         # Encoding
