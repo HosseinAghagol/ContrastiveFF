@@ -143,7 +143,9 @@ def main():
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
     if opt.non_linear_m:
         positive_margin = opt.mL + (opt.m0 - opt.mL) * (np.exp(-5 * np.linspace(0, 1, opt.L)))
+    
     criterions = [SupMCon(opt, positive_margin[l]) for l in range(len(model.layers))]
+    if opt.m0 ==0: criterions = [SupMCon(opt, 0) for l in range(len(model.layers))]
 
     loss_valid_min = np.inf
     
