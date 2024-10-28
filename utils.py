@@ -140,26 +140,19 @@ class CustomTensorDataset(Dataset):
 
         
 def set_loaders(args):
-    valid_size = 0.1
+
     train_transform = []
-    if args.randaug: train_transform.append(v2.RandAugment(2,14))
-    train_transform.extend([v2.RandomCrop(32, padding=4),
-                            v2.RandomHorizontalFlip(),
+    if args.randaug: train_transform.append(v2.RandAugment(3,14))
+    else: train_transform.append(v2.RandomCrop(32, padding=4))
+
+    train_transform.extend([v2.RandomHorizontalFlip(),
                             v2.ToDtype(torch.float32, scale=True),
                             v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
-    
-    # train_transform = transforms.Compose([
-    #                                     v2.RandomCrop(32, padding=4),
-    #                                     v2.RandomHorizontalFlip(),
-    #                                     v2.ToDtype(torch.float32, scale=True),
-    #                                     v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-    #                                     ])
 
     train_transform = transforms.Compose(train_transform)
-    test_transform = transforms.Compose([
-                                        v2.ToDtype(torch.float32, scale=True),
-                                        v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-                                        ])
+
+    test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
+                                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
     train_dataset  = datasets.CIFAR10('./data/',train=True,transform=v2.ToImage(),download=True)
     test_dataset   = datasets.CIFAR10('./data/',train=False,transform=v2.ToImage(),download=True)
@@ -168,9 +161,6 @@ def set_loaders(args):
     args.num_patches = int((32**2) / (args.patch_size**2))
     args.num_class   = 10
     
-    # train_size = int(0.9 * len(train_dataset))
-    # val_size   = len(train_dataset) - train_size
-    # train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
     if args.on_ram:
         print('loading data on ram')
@@ -201,15 +191,6 @@ def set_loaders(args):
     test_loader  = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     return {'train': train_loader, 'valid':valid_loader, 'test':test_loader}
-
-# def load_data_on_ram(loader):
-
-#     temp = next(iter(loader))
-
-#     x = temp[0]
-#     y = temp[1]
-
-#     return x, y
 
 def set_optimizers(model,args):
     optimizers = []

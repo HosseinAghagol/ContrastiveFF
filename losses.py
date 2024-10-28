@@ -43,10 +43,6 @@ class SupMCon(nn.Module):
                                   torch.clamp(anchor_dot_contrast+self.positive_margin,max=1),
                                   anchor_dot_contrast)
 
-        # anchor_dot_contrast = torch.where(mask == 0,
-        #                           torch.clamp(anchor_dot_contrast-self.negative_margin,min=0),
-        #                           anchor_dot_contrast)
-
         anchor_dot_contrast = torch.div(anchor_dot_contrast,self.temperature)
         # for numerical stability
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
@@ -60,8 +56,6 @@ class SupMCon(nn.Module):
         # compute mean of log-likelihood over positive
         mean_log_prob_pos = (mask * log_prob).sum(1) / mask.sum(1)
 
-        # loss
-        # loss = - (self.temperature / self.base_temperature) * mean_log_prob_pos
         loss = - 1 * mean_log_prob_pos
 
         loss = loss.view(count, n).mean()
