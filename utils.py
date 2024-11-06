@@ -143,7 +143,6 @@ def set_loaders(args):
 
     train_transform = []
     if args.randaug: train_transform.append(v2.RandAugment(3,14))
-    # else: train_transform.append(v2.RandomCrop(32, padding=4))
 
     train_transform.extend([v2.RandomCrop(32, padding=4),
                             v2.RandomHorizontalFlip(),
@@ -181,7 +180,7 @@ def set_loaders(args):
         train_labels = train_labels[indices_train]
 
         train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
-        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=train_transform, one_forward=args.one_forward)
+        valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=test_transform, one_forward=args.one_forward)
         test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=True)
 
 
