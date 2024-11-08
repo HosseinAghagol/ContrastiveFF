@@ -110,7 +110,7 @@ class ViT(nn.Module):
             
         # Classification head
         self.classifier_head = nn.Sequential(nn.LayerNorm(opt.E),
-                                             nn.Linear(opt.E, 10))
+                                             nn.Linear(opt.E, opt.num_class))
 
     def forward(self, x):
         # Encoding
