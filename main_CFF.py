@@ -95,7 +95,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
     return losses/n
 
 
-def eval(test_loader, model, criterion, opt):
+def eval(test_loader, model, opt):
 
     model.eval()
 
@@ -107,23 +107,19 @@ def eval(test_loader, model, criterion, opt):
     for batch in test_loader:
 
         features = batch[0].to('cuda')
-        targets = batch[1].to('cuda')
-
+        targets  = batch[1].to('cuda')
         n += len(targets)
 
         # Extracting feature
         for l in range(opt.L): features = model.layers[l](features)
         # Classifier head
         output = model.classifier_head(features.mean(1))
-
-        loss   = criterion(output, targets)
-        
-        num_corrects += torch.sum(torch.argmax(output, dim=1) == targets).cpu().item()
-        losses += loss.item() * len(targets)
+        _, pred = output.topk(opt.eval_mode, 1, True, True)
+        num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
     accuracy = num_corrects/n
 
-    return losses/n, accuracy
+    return accuracy
 
 
 
@@ -214,8 +210,8 @@ def main():
             
     print('\n################## Evaluation ##################\n')
     model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
-    losses, accuracy = eval(loaders['test'], model, criterion, opt)
-    print(losses, accuracy)
+    accuracy = eval(loaders['test'], model, opt)
+    print(accuracy*100)
 
 if __name__ == '__main__':
     main()

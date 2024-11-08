@@ -12,7 +12,7 @@ def parse_option():
 
     parser = argparse.ArgumentParser('argument for training')
 
-    parser.add_argument('--data', type=str, default=10,choices=['cifar10', 'cifar100','tiny_imagenet'], help='set data')
+    parser.add_argument('--data', type=str, default='cifar10',choices=['cifar10', 'cifar100','tiny_imagenet'], help='set data')
     
     parser.add_argument('--batch_size', type=int, default=512, help='batch_size')
     
@@ -141,25 +141,50 @@ class CustomTensorDataset(Dataset):
         
 def set_loaders(args):
 
-    train_transform = []
-    if args.randaug: train_transform.append(v2.RandAugment(3,14))
 
-    train_transform.extend([v2.RandomCrop(32, padding=4),
-                            v2.RandomHorizontalFlip(),
-                            v2.ToDtype(torch.float32, scale=True),
-                            v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-    train_transform = transforms.Compose(train_transform)
+    if args.data=='cifar10':
 
-    test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
-                                         v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+        train_transform = []
+        if args.randaug: train_transform.append(v2.RandAugment(3,14))
 
-    train_dataset  = datasets.CIFAR10('./data/',train=True,transform=v2.ToImage(),download=True)
-    test_dataset   = datasets.CIFAR10('./data/',train=False,transform=v2.ToImage(),download=True)
+        train_transform.extend([v2.RandomCrop(32, padding=4),
+                                v2.RandomHorizontalFlip(),
+                                v2.ToDtype(torch.float32, scale=True),
+                                v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+        train_transform = transforms.Compose(train_transform)
+        test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
+                                            v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+    
+        train_dataset = datasets.CIFAR10('./data/',train=True,transform=v2.ToImage(),download=True)
+        test_dataset  = datasets.CIFAR10('./data/',train=False,transform=v2.ToImage(),download=True)
 
-    args.patch_size  = 4
-    args.num_patches = int((32**2) / (args.patch_size**2))
-    args.num_class   = 10
+        args.patch_size  = 4
+        args.num_patches = int((32**2) / (args.patch_size**2))
+        args.num_class   = 10
+        args.eval_mode   = 1
+
+    elif args.data=='cifar100':
+        train_transform = []
+        if args.randaug: train_transform.append(v2.RandAugment(3,14))
+
+        train_transform.extend([v2.RandomCrop(32, padding=4),
+                                v2.RandomHorizontalFlip(),
+                                v2.ToDtype(torch.float32, scale=True),
+                                v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+        train_transform = transforms.Compose(train_transform)
+        test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
+                                            v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+        
+        train_dataset = datasets.CIFAR100('./data/',train=True,transform=v2.ToImage(),download=True)
+        test_dataset  = datasets.CIFAR100('./data/',train=False,transform=v2.ToImage(),download=True)
+
+        args.patch_size  = 4
+        args.num_patches = int((32**2) / (args.patch_size**2))
+        args.num_class   = 10
+        args.eval_mode   = 5
+       
+
     
 
     if args.on_ram:
