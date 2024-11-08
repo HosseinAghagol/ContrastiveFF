@@ -181,7 +181,7 @@ def set_loaders(args):
 
         args.patch_size  = 4
         args.num_patches = int((32**2) / (args.patch_size**2))
-        args.num_class   = 10
+        args.num_class   = 100
         args.eval_mode   = 5
        
 
