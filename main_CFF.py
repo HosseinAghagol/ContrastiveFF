@@ -137,9 +137,7 @@ def main():
     # build optimizer
     optimizers = set_optimizers(model, opt)
     positive_margin = np.linspace(opt.m0, opt.mL, opt.L)
-    if opt.non_linear_m:
-        positive_margin = opt.mL + (opt.m0 - opt.mL) * (np.exp(-5 * np.linspace(0, 1, opt.L)))
-    
+
     criterions = [SupMCon(opt, positive_margin[l]) for l in range(len(model.layers))]
     if opt.m0 ==0: criterions = [SupMCon(opt, 0) for l in range(len(model.layers))]
 
@@ -198,7 +196,7 @@ def main():
 
         time2  = time.time()
 
-        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs2 + first_epoch, time2 - time1))
+        print('----------------------------------------\nepoch [{}/{}], {:.1f}s\n'.format(epoch, opt.epochs2, time2 - time1))
 
         print(losses['train'])
         print(losses['valid'])
