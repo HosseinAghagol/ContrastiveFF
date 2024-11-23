@@ -13,40 +13,24 @@ def parse_option():
     parser = argparse.ArgumentParser('argument for training')
 
     parser.add_argument('--data', type=str, default='cifar10',choices=['cifar10', 'cifar100','tiny_imagenet'], help='set data')
-    
     parser.add_argument('--batch_size', type=int, default=512, help='batch_size')
-    
     parser.add_argument('--epochs1', type=int, default=600, help='number of training epochs')
-
     parser.add_argument('--epochs2', type=int, default=50, help='number of training epochs')
-    
     parser.add_argument('--E', type=int, default=128, help='')
-    
     parser.add_argument('--H', type=int, default=4, help='')
-    
     parser.add_argument('--L', type=int, default=6, help='')
-
     parser.add_argument('--patch_size', type=int, default=4, help='')
-    
     parser.add_argument('--lr1', type=float, default=0.004, help='learning rate stage 1')
-
     parser.add_argument('--lr2', type=float, default=0.0005, help='learning rate stage 2')
-    
     parser.add_argument('--temp', type=float, default=0.15, help='temperature for contrastive loss function')
-
     parser.add_argument('--one_forward', action='store_true', help='')
-    
     parser.add_argument('--m0', type=float, default=0.4, help='')
-    
     parser.add_argument('--mL', type=float, default=0.1, help='')
-
     parser.add_argument('--randaug', action='store_true', help='')
-
     parser.add_argument('--resume', action='store_true', help='')
-
     parser.add_argument('--non_linear_m', action='store_true', help='')
-
     parser.add_argument('--on_ram', action='store_true', help='')
+    parser.add_argument('--trial', type=int, default=1, help='')
     
 
     # parser.add_argument('--print_freq', type=int, default=10,
@@ -193,8 +177,9 @@ def set_loaders(args):
         train_labels = torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))])
         test_data    = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
         test_labels  = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+        # torch.manual_seed(args.trial)
         indices = torch.randperm(len(train_data))
-
+        print(indices)
         indices_train = indices[:int(0.9 * len(train_data))]
         indices_valid = indices[int(0.9 * len(train_data)):]
 
