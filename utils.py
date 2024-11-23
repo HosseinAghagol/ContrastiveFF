@@ -179,7 +179,6 @@ def set_loaders(args):
         test_labels  = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
         torch.manual_seed(args.trial)
         indices = torch.randperm(len(train_data))
-        print(indices)
         indices_train = indices[:int(0.9 * len(train_data))]
         indices_valid = indices[int(0.9 * len(train_data)):]
 
