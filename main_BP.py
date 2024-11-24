@@ -77,7 +77,7 @@ def main():
 
     first_epoch = 0
     if opt.resume:
-        model, optimizers, first_epoch, loss_valid_min = load_model(model, optimizers)
+        model, optimizer, first_epoch, loss_valid_min = load_model(model, [optimizer])
 
 
     loss_valid_min = np.inf
