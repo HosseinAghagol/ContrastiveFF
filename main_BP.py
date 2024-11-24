@@ -76,11 +76,21 @@ def main():
     criterion = torch.nn.CrossEntropyLoss()
 
     first_epoch = 0
-    if opt.resume:
-        model, optimizer, first_epoch, loss_valid_min = load_model(model, [optimizer])
-
-
     loss_valid_min = np.inf
+
+    if opt.resume:
+        # Load the checkpoint
+        checkpoint = torch.load('./save/cp.pth', weights_only=True)
+        # Restore the model state
+        model.load_state_dict(checkpoint['model'])
+        # Restore each optimizer's state
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        # Restore the epoch number
+        epoch = checkpoint['epoch']
+        loss_valid_min = checkpoint['loss_min']
+
+
+    
     for epoch in range(first_epoch+1, opt.epochs1 + first_epoch+1):
         losses = {'train':0,'valid':0}
 
@@ -102,7 +112,13 @@ def main():
             loss_valid_min = losses['valid']
             torch.save(model.state_dict(), './save/model_best.pth')
 
-        save_model(model , [optimizer], epoch, loss_valid_min)
+        state = {
+        'model': model.state_dict(),
+        'optimizer': optimizer,
+        'epoch': epoch,
+        'loss_min':loss_valid_min
+        }
+        torch.save(state, './save/cp.pth')
 
     print('\n################## Evaluation ##################\n')
     model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
