@@ -22,7 +22,7 @@ def one_epoch(loader, model, criterion, optimizer, phase='train'):
         features, targets = batch[0].to('cuda'), batch[1].to('cuda')
         n += len(targets)
 
-        outputs = model.classifier(features)
+        outputs = model(features)
         loss    = criterion(outputs, targets)
 
         if phase=='train':
@@ -50,8 +50,6 @@ def eval(test_loader, model, opt):
         targets  = batch[1].to('cuda')
         n += len(targets)
 
-        # Extracting feature
-        # Classifier head
         output = model(features)
         _, pred = output.topk(opt.eval_mode, 1, True, True)
         num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
@@ -74,7 +72,7 @@ def main():
     model = ViT(opt).to('cuda')
     loss_valid_min = np.inf
     
-    optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=opt.lr2)
     criterion = torch.nn.CrossEntropyLoss()
 
     first_epoch = 0
