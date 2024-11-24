@@ -5,7 +5,6 @@ import torch
 import matplotlib.pyplot as plt
 
 from utils import parse_option
-from utils import save_model,load_model
 from utils import set_loaders
 
 from models.vit import ViT
@@ -114,7 +113,7 @@ def main():
 
         state = {
         'model': model.state_dict(),
-        'optimizer': optimizer,
+        'optimizer': optimizer.state_dict(),
         'epoch': epoch,
         'loss_min':loss_valid_min
         }
