@@ -193,12 +193,12 @@ def set_loaders(args):
         valid_labels = train_labels[indices_valid]
         train_labels = train_labels[indices_train]
         #######################################
-        indices = torch.randperm(int(len(train_data)*0.2))
+        indices = torch.randperm(int(len(train_data)*0.4))
         # train_data   = train_data[indices]
         # train_labels = train_labels[indices]
         train_labels[indices] = wrong(train_labels[indices])
 
-        indices = torch.randperm(int(len(valid_data)*0.2))
+        indices = torch.randperm(int(len(valid_data)*0.4))
         # valid_data   = valid_data[indices]
         # valid_labels = valid_labels[indices]
         valid_labels[indices] = wrong(valid_labels[indices])
