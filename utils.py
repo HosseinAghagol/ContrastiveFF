@@ -200,7 +200,7 @@ def set_loaders(args):
 
         indices = torch.randperm(int(len(valid_data)*0.2))
         valid_data   = train_data[indices]
-        train_labels = train_labels[indices]
+        valid_labels = train_labels[indices]
         # valid_labels = wrong(train_labels[indices])
         ########################################
         train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
