@@ -7,6 +7,11 @@ from torchvision import datasets
 from torchvision import transforms
 from torchvision.transforms import v2
 from torch.utils.data.sampler import SubsetRandomSampler
+import os
+import urllib.request
+import zipfile
+from random import shuffle
+from math import floor
 
 def parse_option():
 
@@ -99,7 +104,46 @@ def parse_option():
         
     return args
 
+def tiny_imagenet():
+    url = "http://cs231n.stanford.edu/tiny-imagenet-200.zip"
+    path = "%s/tiny-imagenet-200.zip" % os.getcwd()
+    urllib.request.urlretrieve(url, path)
+    path_to_zip_file = "%s/tiny-imagenet-200.zip" % os.getcwd()
+    directory_to_extract_to = os.getcwd()
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
+    val_dir = "%s/tiny-imagenet-200/val" % os.getcwd()
+    val_annotations = "%s/val_annotations.txt" % val_dir
+    val_dict = {}
+    with open(val_annotations, 'r') as f:
+        for line in f:
+            line = line.strip().split()
+            assert(len(line) == 6)
+            wnind = line[1]
+            img_name = line[0]
+            boxes = '\t'.join(line[2:])
+            if wnind not in val_dict:
+                val_dict[wnind] = []
+            entries = val_dict[wnind]
+            entries.append((img_name, boxes))
+    assert(len(val_dict) == 200)
+    for wnind, entries in val_dict.items():
+        val_wnind_dir = "%s/%s" % (val_dir, wnind)
+        val_images_dir = "%s/images" % val_dir
+        val_wnind_images_dir = "%s/images" % val_wnind_dir
+        os.mkdir(val_wnind_dir)
+        os.mkdir(val_wnind_images_dir)
+        wnind_boxes = "%s/%s_boxes.txt" % (val_wnind_dir, wnind)
+        f = open(wnind_boxes, "w")
+        for img_name, box in entries:
+            source = "%s/%s" % (val_images_dir, img_name)
+            dst = "%s/%s" % (val_wnind_images_dir, img_name)
+            os.system("cp %s %s" % (source, dst))
+            f.write("%s\t%s\n" % (img_name, box))
+        f.close()
+    os.system("rm -rf %s" % val_images_dir)
 
+     
 class CustomTensorDataset(Dataset):
     def __init__(self, X, y, transform, one_forward):
         self.X = X
@@ -122,11 +166,11 @@ class CustomTensorDataset(Dataset):
         return image, label
     
 
-def wrong(labels):
-    labels_wrong = labels.clone()
-    for c in range(10):
-        labels_wrong[labels==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(labels==c).sum().item()))
-    return labels_wrong
+# def wrong(labels):
+#     labels_wrong = labels.clone()
+#     for c in range(10):
+#         labels_wrong[labels==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(labels==c).sum().item()))
+#     return labels_wrong
         
 def set_loaders(args):
 
@@ -173,7 +217,27 @@ def set_loaders(args):
         args.num_class   = 100
         args.eval_mode   = 5
        
+    elif args.data=='tiny_imagenet':
+        train_transform = []
+        if args.randaug: train_transform.append(v2.RandAugment(3,14))
 
+        train_transform.extend([v2.RandomCrop(64, padding=6),
+                                v2.RandomHorizontalFlip(),
+                                v2.ToDtype(torch.float32, scale=True),
+                                v2.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+        
+        train_transform = transforms.Compose(train_transform)
+        test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
+                                            v2.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+        
+        train_dataset  = datasets.ImageFolder(root='tiny-imagenet-200/train',transform=v2.ToImage())
+        test_dataset   = datasets.ImageFolder(root='tiny-imagenet-200/val'  ,transform=v2.ToImage())
+
+        args.patch_size  = 8
+        args.num_patches = int((64**2) / (args.patch_size**2))
+        args.num_class   = 200
+        args.eval_mode   = 10
+         
     
 
     if args.on_ram:
