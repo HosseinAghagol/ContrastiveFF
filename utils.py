@@ -229,7 +229,7 @@ def set_loaders(args):
         train_transform = transforms.Compose(train_transform)
         test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
                                             v2.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
-        
+        tiny_imagenet()
         train_dataset  = datasets.ImageFolder(root='tiny-imagenet-200/train',transform=v2.ToImage())
         test_dataset   = datasets.ImageFolder(root='tiny-imagenet-200/val'  ,transform=v2.ToImage())
 
