@@ -208,7 +208,10 @@ def main():
             
     print('\n################## Evaluation ##################\n')
     model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
+    time1  = time.time()
     accuracy = eval(loaders['test'], model, opt)
+    time2  = time.time()
+    print(time2 - time1)
     print(accuracy*100)
 
 if __name__ == '__main__':
