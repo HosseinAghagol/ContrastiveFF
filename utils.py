@@ -166,11 +166,11 @@ class CustomTensorDataset(Dataset):
         return image, label
     
 
-# def wrong(labels):
-#     labels_wrong = labels.clone()
-#     for c in range(10):
-#         labels_wrong[labels==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(labels==c).sum().item()))
-#     return labels_wrong
+def wrong(labels):
+    labels_wrong = labels.clone()
+    for c in range(10):
+        labels_wrong[labels==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(labels==c).sum().item()))
+    return labels_wrong
         
 def set_loaders(args):
 
@@ -256,17 +256,17 @@ def set_loaders(args):
         
         valid_labels = train_labels[indices_valid]
         train_labels = train_labels[indices_train]
-        #######################################
-        # indices = torch.randperm(int(len(train_data)*0.2))
+        ######################################
+        indices = torch.randperm(int(len(train_data)*0.3))
         # train_data   = train_data[indices]
         # train_labels = train_labels[indices]
-        # # train_labels[indices] = wrong(train_labels[indices])
+        train_labels[indices] = wrong(train_labels[indices])
 
-        # indices = torch.randperm(int(len(valid_data)*0.2))
+        indices = torch.randperm(int(len(valid_data)*0.3))
         # valid_data   = valid_data[indices]
         # valid_labels = valid_labels[indices]
-        # # valid_labels[indices] = wrong(valid_labels[indices])
-        ########################################
+        valid_labels[indices] = wrong(valid_labels[indices])
+        #######################################
         train_dataset = CustomTensorDataset(train_data, train_labels, transform=train_transform, one_forward=args.one_forward)
         valid_dataset = CustomTensorDataset(valid_data, valid_labels, transform=train_transform, one_forward=args.one_forward)
         test_dataset  = CustomTensorDataset(test_data, test_labels, transform=test_transform, one_forward=True)
