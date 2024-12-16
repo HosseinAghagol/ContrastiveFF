@@ -11,7 +11,7 @@ class PatchingLayer(nn.Module):
     def __init__(self,opt):
         super().__init__()
         self.patch_size = opt.patch_size
-        # self.labels     = torch.randn(10,H // self.patch_size, self.patch_size, W // self.patch_size).cuda()
+        self.labels     = torch.randn(10,self.patch_size * self.patch_size*3).cuda()
 
     def forward(self, x, y):
 
@@ -22,7 +22,6 @@ class PatchingLayer(nn.Module):
         x = x.permute(0, 2, 4, 1, 3, 5)
         x = x.flatten(1,2)
         x = x.flatten(2, 4)
-        print(x.shape)
         x = torch.cat([self.labels[y], x], dim=1)
         return x
     
