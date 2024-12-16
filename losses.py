@@ -76,7 +76,7 @@ class SupMCon(nn.Module):
 
 class FFloss(nn.Module):
 
-    def __init__(self, opt, positive_margin):
+    def __init__(self, opt):
         super(FFloss, self).__init__()
 
     def forward(self, features, labels=None):
