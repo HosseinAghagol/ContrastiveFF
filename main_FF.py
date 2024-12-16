@@ -114,14 +114,15 @@ def eval_energy(test_loader, model, opt):
 
         # Extracting feature
         g = torch.zeros(len(x), opt.num_class).cuda()
-        for c in opt.num_class:
-            x = model.patching_layer(x, torch.ones(len(x)).long().cuda() * y)
+        for c in range(opt.num_class):
+            x_ = model.patching_layer(x, torch.ones(len(x)).long().cuda() * c)
             for l in range(opt.L):
-                x = model.layers[l](x)
-                g[:,c] = x.mean(1).pow(2).mean(1)
+                x_ = model.layers[l](x_)
+                g[:,c] = x_.mean(1).pow(2).mean(1)
+                x_ = F.normalize(torch.flatten(x_,1)).view(x_.shape)
 
-            _, pred = g.topk(opt.eval_mode, 1, True, True)
-            num_corrects += pred.eq(y.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
+        _, pred = g.topk(opt.eval_mode, 1, True, True)
+        num_corrects += pred.eq(y.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
     accuracy = num_corrects/n
 
@@ -179,7 +180,6 @@ def main():
             torch.save(model.state_dict(), './save/model_best.pth')
 
         save_model(model , optimizers, epoch, loss_valid_min)
-    print(opt.one_pass_softmax)
     if opt.one_pass_softmax:
         print('\n################## Training-Stage 2 ##################\n')
         # Stage 2
