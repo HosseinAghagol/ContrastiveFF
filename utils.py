@@ -37,7 +37,7 @@ def parse_option():
     parser.add_argument('--on_ram', action='store_true', help='')
     parser.add_argument('--trial', type=int, default=1, help='')
     parser.add_argument('--threshold', type=int, default=2, help='')
-    parser.add_argument('--one_pass_softmax', action='store_false', help='')
+    parser.add_argument('--one_pass_softmax', action='store_true', help='')
     
     # parser.add_argument('--print_freq', type=int, default=10,
     #                     help='print frequency')
