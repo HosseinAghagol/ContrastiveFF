@@ -30,10 +30,9 @@ class PatchingLayer(nn.Module):
     def __init__(self,opt):
         super().__init__()
         self.patch_size = opt.patch_size
+        self.labels     = torch.randn(10,1,self.patch_size * self.patch_size*3).cuda()
 
-
-    def forward(self, x):
-
+    def forward(self, x, y=None):
 
         B, C, H, W = x.shape
 
@@ -42,7 +41,8 @@ class PatchingLayer(nn.Module):
         x = x.permute(0, 2, 4, 1, 3, 5)
         x = x.flatten(1,2)
         x = x.flatten(2, 4)
-
+        if y!=None:
+            x = torch.cat([self.labels[y], x], dim=1)
         return x
     
 
@@ -93,12 +93,11 @@ class ViT(nn.Module):
     def __init__(self, opt):
         super().__init__()
 
-        
+        self.patching_layer = PatchingLayer(opt),
         self.layers = nn.ModuleList()
 
         # First layer
         self.layers.append(nn.Sequential(
-          PatchingLayer(opt),
           nn.Linear(3*(opt.patch_size**2), opt.E),
           nn.ReLU(),
           PositionalEncoder(opt),
