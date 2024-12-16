@@ -14,7 +14,7 @@ from utils import save_model,load_model
 from utils import set_loaders
 
 from models.vit_ff import ViT
-from losses import SupMCon
+from losses import FFLoss
 
 # def cat_label_patch
 def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
