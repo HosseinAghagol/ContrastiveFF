@@ -70,3 +70,16 @@ class SupMCon(nn.Module):
         loss = loss.view(count, n).mean()
 
         return loss
+    
+
+
+
+class FFloss(nn.Module):
+
+    def __init__(self, opt, positive_margin):
+        super(FFloss, self).__init__()
+
+    def forward(self, features, labels=None):
+
+
+        return None
