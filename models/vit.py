@@ -93,7 +93,7 @@ class ViT(nn.Module):
     def __init__(self, opt):
         super().__init__()
 
-        self.patching_layer = PatchingLayer(opt),
+        self.patching_layer = PatchingLayer(opt)
         self.layers = nn.ModuleList()
 
         # First layer
