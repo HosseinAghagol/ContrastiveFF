@@ -179,7 +179,7 @@ def main():
             torch.save(model.state_dict(), './save/model_best.pth')
 
         save_model(model , optimizers, epoch, loss_valid_min)
-
+    print(opt.one_pass_softmax)
     if opt.one_pass_softmax:
         print('\n################## Training-Stage 2 ##################\n')
         # Stage 2
@@ -216,7 +216,7 @@ def main():
     # Eval
     model.load_state_dict(torch.load('./save/model_best.pth', weights_only=True))
     time1  = time.time()
-    accuracy = eval(loaders['test'], model, opt)
+    accuracy = eval_energy(loaders['test'], model, opt)
     time2  = time.time()
     print(time2 - time1)
     print(accuracy*100)
