@@ -34,12 +34,12 @@ def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
     for batch in loader:
         x = batch[0].to('cuda')
         
-        targets_pos = batch[1].to('cuda')
-        targets_neg = wrong(targets_pos)
+        y_pos = batch[1].to('cuda')
+        y_neg = wrong(y_pos)
 
-        n += len(targets_pos)
-        x_pos = model.patching_layer(x,targets_pos)
-        x_neg = model.patching_layer(x,targets_neg)
+        n += len(y_pos)
+        x_pos = model.patching_layer(x, y_pos)
+        x_neg = model.patching_layer(x, y_neg)
 
         for l in range(opt.L):
             
@@ -55,7 +55,7 @@ def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
             x_pos = F.normalize(torch.flatten(x_pos,1)).view(x_pos.shape)
             x_neg = F.normalize(torch.flatten(x_neg,1)).view(x_neg.shape)
 
-            losses[l] += loss.item() * len(targets_pos)
+            losses[l] += loss.item() * len(y_pos)
 
     return losses/n
 
@@ -98,27 +98,30 @@ def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
     return losses/n
 
 
-def eval(test_loader, model, opt):
+def eval_energy(test_loader, model, opt):
 
     model.eval()
 
-    losses       = 0
     num_corrects = 0
     n            = 0
 
     torch.set_grad_enabled(False)
     for batch in test_loader:
 
-        features = batch[0].to('cuda')
-        targets  = batch[1].to('cuda')
-        n += len(targets)
+        x = batch[0].to('cuda')
+        y = batch[1].to('cuda')
+        n += len(y)
 
         # Extracting feature
-        for l in range(opt.L): features = model.layers[l](features)
-        # Classifier head
-        output = model.classifier_head(features.mean(1))
-        _, pred = output.topk(opt.eval_mode, 1, True, True)
-        num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
+        g = torch.zeros(len(x), opt.num_class).cuda()
+        for c in opt.num_class:
+            x = model.patching_layer(x, torch.ones(len(x)).long().cuda() * y)
+            for l in range(opt.L):
+                x = model.layers[l](x)
+                g[:,c] = x.mean(1).pow(2).mean(1)
+
+            _, pred = g.topk(opt.eval_mode, 1, True, True)
+            num_corrects += pred.eq(y.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
     accuracy = num_corrects/n
 
