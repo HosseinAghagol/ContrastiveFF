@@ -16,8 +16,14 @@ from utils import set_loaders
 from models.vit_ff import ViT
 from losses import FFLoss
 
-# def cat_label_patch
-def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
+
+def wrong(targets_pos):
+    targets_neg = targets_pos.clone()
+    for c in range(10):
+        targets_neg[targets_pos==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(targets_pos==c).sum().item())).cuda()
+    return targets_neg
+
+def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
     
     losses = torch.zeros(opt.L)
     n      = 0
@@ -28,23 +34,29 @@ def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
     for batch in loader:
         x = batch[0].to('cuda')
         
-        targets = batch[1].to('cuda')
+        targets_pos = batch[1].to('cuda')
+        targets_neg = wrong(targets_pos)
 
-        n += len(targets)
+        n += len(targets_pos)
+        x_pos = model.patching_layer(x,targets_pos)
+        x_neg = model.patching_layer(x,targets_neg)
 
         for l in range(opt.L):
-            x = model.patching_layer(x,targets)
-            x1 = model.layers[l](x1.detach())
-            x2 = model.layers[l](x2.detach())
-            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
-
+            
+            x_pos = model.layers[l](x_pos.detach())
+            x_neg = model.layers[l](x_neg.detach())
+            loss  = criterion(x_pos.mean(1),x_neg.mean(1))
 
             if phase=='train':
                 optimizers[l].zero_grad()
                 loss.backward()
                 optimizers[l].step()
 
-            losses[l] += loss.item() * len(targets)
+            x_pos = F.normalize(torch.flatten(x_pos,1)).view(x_pos.shape)
+            x_neg = F.normalize(torch.flatten(x_neg,1)).view(x_neg.shape)
+
+            losses[l] += loss.item() * len(targets_pos)
+
     return losses/n
 
 
@@ -131,7 +143,7 @@ def main():
     # build optimizer
     optimizers = set_optimizers(model, opt)
 
-    criterions = [FFLoss(opt) for l in range(len(model.layers))]
+    criterion = FFLoss(opt)
 
     loss_valid_min = np.inf
     
@@ -148,8 +160,8 @@ def main():
 
         time1  = time.time()
 
-        losses['train'] = one_epoch_stage1(loaders['train'], model, criterions, optimizers, opt, phase='train')
-        losses['valid'] = one_epoch_stage1(loaders['valid'], model, criterions, optimizers, opt, phase='valid')
+        losses['train'] = one_epoch_stage1(loaders['train'], model, criterion, optimizers, opt, phase='train')
+        losses['valid'] = one_epoch_stage1(loaders['valid'], model, criterion, optimizers, opt, phase='valid')
 
         time2  = time.time()
         
@@ -165,10 +177,9 @@ def main():
 
         save_model(model , optimizers, epoch, loss_valid_min)
 
-
-    print('\n################## Training-Stage 2 ##################\n')
-    # Stage 2
     if opt.one_pass_softmax:
+        print('\n################## Training-Stage 2 ##################\n')
+        # Stage 2
         optimizer = torch.optim.AdamW(model.classifier_head.parameters(), lr=opt.lr2)
         criterion = torch.nn.CrossEntropyLoss()
 

@@ -36,6 +36,7 @@ def parse_option():
     parser.add_argument('--non_linear_m', action='store_true', help='')
     parser.add_argument('--on_ram', action='store_true', help='')
     parser.add_argument('--trial', type=int, default=1, help='')
+    parser.add_argument('--threshold', type=int, default=2, help='')
     
 
     # parser.add_argument('--print_freq', type=int, default=10,
