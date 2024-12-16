@@ -16,7 +16,7 @@ from utils import set_loaders
 from models.vit_ff import ViT
 from losses import SupMCon
 
-def cat_label_patch
+# def cat_label_patch
 def one_epoch_stage1(loader, model, criterions, optimizers, opt, phase='train'):
     
     losses = torch.zeros(opt.L)
