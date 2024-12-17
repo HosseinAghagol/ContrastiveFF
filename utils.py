@@ -284,7 +284,7 @@ def set_loaders(args):
 def set_optimizers(model,args):
     optimizers = []
     for l in range(args.L):
-        optimizers.append(torch.optim.AdamW(model.layers[l].parameters() , lr=args.lr1))
+        optimizers.append(torch.optim.Adam(model.layers[l].parameters() , lr=args.lr1))
     return optimizers
 
 def save_model(model, optimizers, epoch, loss_min):
