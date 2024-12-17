@@ -34,7 +34,7 @@ class PatchingLayer(nn.Module):
         for c in range(opt.num_class):
             torch.manual_seed(c)
             indices = torch.randperm(int(self.labels.shape[2]*0.2))
-            self.labels[c,1,indices] = 1
+            self.labels[c,:,indices] = 1
 
 
     def forward(self, x, y=None):
