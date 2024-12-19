@@ -36,9 +36,8 @@ class PatchingLayer(nn.Module):
     def set_label_rep(self,x):
         self.labels  = torch.zeros(self.num_class,1,self.patch_size * self.patch_size*3).cuda()
         for c in range(self.num_class):
-            indices = torch.randperm(int(self.labels.shape[2]*0.2))
-            print(indices)
-            self.labels[c,:,indices] = x.max()
+            indices = torch.randperm(int(self.labels.shape[2]))
+            self.labels[c,:,indices[int(len(indices)*0.2)]] = x.max()
             self.flag = False
 
     def forward(self, x, y=None):
