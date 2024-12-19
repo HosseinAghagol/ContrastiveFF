@@ -32,8 +32,8 @@ class PatchingLayer(nn.Module):
         self.patch_size = opt.patch_size
         self.labels     = torch.zeros(opt.num_class,1,self.patch_size * self.patch_size*3).cuda()
         for c in range(opt.num_class):
-            torch.manual_seed(c)
             indices = torch.randperm(int(self.labels.shape[2]*0.2))
+            print(indices)
             self.labels[c,:,indices] = 1
 
 
