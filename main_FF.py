@@ -17,10 +17,10 @@ from models.vit import ViT
 from losses import FFLoss
 
 
-def wrong(targets_pos):
+def wrong(opt,targets_pos):
     targets_neg = targets_pos.clone()
-    for c in range(10):
-        targets_neg[targets_pos==c] = torch.LongTensor(np.random.choice(list(set(np.arange(10)) - {c}),(targets_pos==c).sum().item())).cuda()
+    for c in range(opt.num_class):
+        targets_neg[targets_pos==c] = torch.LongTensor(np.random.choice(list(set(np.arange(opt.num_class)) - {c}),(targets_pos==c).sum().item())).cuda()
     return targets_neg
 
 def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
@@ -35,7 +35,7 @@ def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
         x = batch[0].to('cuda')
         
         y_pos = batch[1].to('cuda')
-        y_neg = wrong(y_pos)
+        y_neg = wrong(opt,y_pos)
 
         n += len(y_pos)
         x_pos = model.patching_layer(x, y_pos)
