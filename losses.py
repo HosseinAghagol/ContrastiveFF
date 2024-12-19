@@ -84,3 +84,19 @@ class FFLoss(nn.Module):
         g_neg = a_neg.pow(2).mean(1)
         
         return torch.log(1 + torch.exp(torch.cat([-g_pos + self.threshold, g_neg - self.threshold]))).mean()
+
+class SymBaLoss(nn.Module):
+
+    def __init__(self, opt):
+        super(SymBaLoss, self).__init__()
+        self.alpha = opt.alpha
+
+    def forward(self, a_pos,a_neg):
+
+        g_pos = a_pos.pow(2).mean(1)
+        g_neg = a_neg.pow(2).mean(1)
+        
+        return torch.log(1 + torch.exp(-self.alpha*(g_pos - g_neg))).mean()
+
+
+

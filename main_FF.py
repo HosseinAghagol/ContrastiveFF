@@ -14,7 +14,7 @@ from utils import save_model,load_model
 from utils import set_loaders
 
 from models.vit import ViT
-from losses import FFLoss
+from losses import FFLoss, SymBaLoss
 
 
 def wrong(opt,targets_pos):
@@ -147,7 +147,8 @@ def main():
     # build optimizer
     optimizers = set_optimizers(model, opt)
 
-    criterion = FFLoss(opt)
+    if opt.symba: criterion = SymBaLoss(opt)
+    else:         criterion = FFLoss(opt)
 
     loss_valid_min = np.inf
     
