@@ -37,6 +37,7 @@ def parse_option():
     parser.add_argument('--on_ram', action='store_true', help='')
     parser.add_argument('--trial', type=int, default=1, help='')
     parser.add_argument('--threshold', type=int, default=2, help='')
+    parser.add_argument('--symba', action='store_true', help='')
     parser.add_argument('--alpha', type=int, default=1, help='')
     parser.add_argument('--one_pass_softmax', action='store_true', help='')
     
