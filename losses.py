@@ -95,7 +95,7 @@ class SymBaLoss(nn.Module):
 
         g_pos = a_pos.pow(2).mean(1)
         g_neg = a_neg.pow(2).mean(1)
-        
+        print(g_pos)
         return torch.log(1 + torch.exp(-self.alpha*(g_pos - g_neg))).mean()
 
 
