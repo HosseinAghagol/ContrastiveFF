@@ -118,7 +118,7 @@ def eval_energy(test_loader, model, opt):
             x_ = model.patching_layer(x, torch.ones(len(x)).long().cuda() * c)
             for l in range(opt.L):
                 x_ = model.layers[l](x_)
-                if l != 0: g[:,c] = x_.mean(1).pow(2).mean(1)
+                if l != 0: g[:,c] = x_[:,1:].mean(1).pow(2).mean(1)
                 x_ = F.normalize(torch.flatten(x_,1)).view(x_.shape)
 
         _, pred = g.topk(opt.eval_mode, 1, True, True)
