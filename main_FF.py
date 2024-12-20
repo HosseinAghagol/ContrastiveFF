@@ -13,7 +13,7 @@ from utils import set_optimizers
 from utils import save_model,load_model
 from utils import set_loaders
 
-from models.vit_ff import ViT
+from models.vit import ViT
 from losses import FFLoss, SymBaLoss
 
 
@@ -45,7 +45,7 @@ def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
             
             x_pos = model.layers[l](x_pos.detach())
             x_neg = model.layers[l](x_neg.detach())
-            loss  = criterion(x_pos.mean(1),x_neg.mean(1))
+            loss  = criterion(x_pos[:,1:].mean(1),x_neg[:,1:].mean(1))
 
             if phase=='train':
                 optimizers[l].zero_grad()
