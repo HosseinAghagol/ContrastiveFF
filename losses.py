@@ -72,19 +72,35 @@ class SupMCon(nn.Module):
         return loss
     
 
-class FFLoss(nn.Module):
+# class FFLoss(nn.Module):
 
+#     def __init__(self, opt):
+#         super(FFLoss, self).__init__()
+#         self.threshold = opt.threshold
+
+#     def forward(self, a_pos,a_neg):
+
+#         g_pos = a_pos.pow(2).mean(1)
+#         g_neg = a_neg.pow(2).mean(1)
+        
+#         return torch.log(1 + torch.exp(torch.cat([-g_pos + self.threshold, g_neg - self.threshold]))).mean()
+    
+class FFLoss(nn.Module):
     def __init__(self, opt):
         super(FFLoss, self).__init__()
         self.threshold = opt.threshold
 
-    def forward(self, a_pos,a_neg):
-
+    def forward(self, a_pos, a_neg):
         g_pos = a_pos.pow(2).mean(1)
         g_neg = a_neg.pow(2).mean(1)
         
-        return torch.log(1 + torch.exp(torch.cat([-g_pos + self.threshold, g_neg - self.threshold]))).mean()
+        # Numerical stability adjustment
+        logits = torch.cat([-g_pos + self.threshold, g_neg - self.threshold])
+        max_logit = logits.max()
+        logits_stable = logits - max_logit  # Stabilize values to avoid large exp values
 
+        return torch.log(1 + torch.exp(logits_stable)).mean()
+    
 class SymBaLoss(nn.Module):
 
     def __init__(self, opt):
@@ -95,7 +111,6 @@ class SymBaLoss(nn.Module):
 
         g_pos = a_pos.pow(2).mean(1)
         g_neg = a_neg.pow(2).mean(1)
-        print(g_pos)
         return torch.log(1 + torch.exp(-self.alpha*(g_pos - g_neg))).mean()
 
 
