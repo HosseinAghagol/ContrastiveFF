@@ -91,8 +91,8 @@ class FFLoss(nn.Module):
         self.threshold = opt.threshold
 
     def forward(self, a_pos, a_neg):
-        g_pos = a_pos.pow(2).mean(1)
-        g_neg = a_neg.pow(2).mean(1)
+        g_pos = a_pos.pow(2).sum(1)
+        g_neg = a_neg.pow(2).sum(1)
         
         # Numerical stability adjustment
         logits = torch.cat([-g_pos + self.threshold, g_neg - self.threshold])
