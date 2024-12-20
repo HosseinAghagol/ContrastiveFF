@@ -99,7 +99,7 @@ class FFLoss(nn.Module):
         max_logit = logits.max()
         logits_stable = logits - max_logit  # Stabilize values to avoid large exp values
 
-        return torch.log(1 + torch.exp(logits_stable)).mean()
+        return max_logit + torch.log(1 + torch.exp(logits_stable)).mean()
     
 class SymBaLoss(nn.Module):
 
