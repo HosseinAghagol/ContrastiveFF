@@ -175,9 +175,9 @@ def main():
         print(losses['train'])
         print(losses['valid'])
 
-        if losses['valid'][-1] < loss_valid_min:
-            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][-1].item() )
-            loss_valid_min = losses['valid'][-1].item()
+        if losses['valid'][1:].sum() < loss_valid_min:
+            print("\nbest val loss:",loss_valid_min,'---------->',losses['valid'][1:].sum().item() )
+            loss_valid_min = losses['valid'][1:].sum().item()
             torch.save(model.state_dict(), './save/model_best.pth')
 
         save_model(model , optimizers, epoch, loss_valid_min)
