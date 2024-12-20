@@ -13,7 +13,7 @@ from utils import set_optimizers
 from utils import save_model,load_model
 from utils import set_loaders
 
-from models.vit import ViT
+from models.vit_ff import ViT
 from losses import FFLoss, SymBaLoss
 
 
