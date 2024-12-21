@@ -72,18 +72,18 @@ class SupMCon(nn.Module):
         return loss
     
 
-# class FFLoss(nn.Module):
+class FFLoss(nn.Module):
 
-#     def __init__(self, opt):
-#         super(FFLoss, self).__init__()
-#         self.threshold = opt.threshold
+    def __init__(self, opt):
+        super(FFLoss, self).__init__()
+        self.threshold = opt.threshold
 
-#     def forward(self, a_pos,a_neg):
+    def forward(self, a_pos,a_neg):
 
-#         g_pos = a_pos.pow(2).mean(1)
-#         g_neg = a_neg.pow(2).mean(1)
+        g_pos = a_pos.pow(2).mean(1)
+        g_neg = a_neg.pow(2).mean(1)
         
-#         return torch.log(1 + torch.exp(torch.cat([-g_pos + self.threshold, g_neg - self.threshold]))).mean()
+        return torch.log(1 + torch.exp(torch.cat([-g_pos + self.threshold, g_neg - self.threshold]))).mean()
     
 class FFLoss(nn.Module):
     def __init__(self, opt):
@@ -111,7 +111,8 @@ class SymBaLoss(nn.Module):
 
         g_pos = a_pos.pow(2).mean(1)
         g_neg = a_neg.pow(2).mean(1)
-        return torch.log(1 + torch.exp(-self.alpha*(g_pos - g_neg))).mean()
+        # return torch.log(1 + torch.exp(-self.alpha*(g_pos - g_neg))).mean()
+        return F.softplus(-self.alpha * (g_pos - g_neg)).mean()
 
 
 
