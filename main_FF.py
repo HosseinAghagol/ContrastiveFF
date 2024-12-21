@@ -122,6 +122,7 @@ def eval_energy(test_loader, model, opt):
                 x_ = F.normalize(torch.flatten(x_,1)).view(x_.shape)
 
         _, pred = g.topk(opt.eval_mode, 1, True, True)
+        print(pred)
         num_corrects += pred.eq(y.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
     accuracy = num_corrects/n
