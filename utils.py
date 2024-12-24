@@ -28,7 +28,7 @@ def parse_option():
     parser.add_argument('--lr1', type=float, default=0.004, help='learning rate stage 1')
     parser.add_argument('--lr2', type=float, default=0.0005, help='learning rate stage 2')
     parser.add_argument('--temp', type=float, default=0.15, help='temperature for contrastive loss function')
-    parser.add_argument('--one_forward', action='store_true', help='')
+    # parser.add_argument('--one_forward', action='store_true', help='')
     parser.add_argument('--m0', type=float, default=0.4, help='')
     parser.add_argument('--mL', type=float, default=0.1, help='')
     parser.add_argument('--randaug', action='store_true', help='')
@@ -41,56 +41,6 @@ def parse_option():
     parser.add_argument('--alpha', type=int, default=1, help='')
     parser.add_argument('--one_pass_softmax', action='store_true', help='')
     
-    # parser.add_argument('--print_freq', type=int, default=10,
-    #                     help='print frequency')
-    # parser.add_argument('--save_freq', type=int, default=50,
-    #                     help='save frequency')
-    # parser.add_argument('--batch_size', type=int, default=256,
-    #                     help='batch_size')
-    # parser.add_argument('--num_workers', type=int, default=16,
-    #                     help='num of workers to use')
-    # parser.add_argument('--epochs', type=int, default=1000,
-    #                     help='number of training epochs')
-
-    # # optimization
-    # parser.add_argument('--learning_rate', type=float, default=0.05,
-    #                     help='learning rate')
-    # parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900',
-    #                     help='where to decay lr, can be a list')
-    # parser.add_argument('--lr_decay_rate', type=float, default=0.1,
-    #                     help='decay rate for learning rate')
-    # parser.add_argument('--weight_decay', type=float, default=1e-4,
-    #                     help='weight decay')
-    # parser.add_argument('--momentum', type=float, default=0.9,
-    #                     help='momentum')
-
-    # # model dataset
-    # parser.add_argument('--model', type=str, default='resnet50')
-    # parser.add_argument('--dataset', type=str, default='cifar10',
-    #                     choices=['cifar10', 'cifar100', 'path'], help='dataset')
-    # parser.add_argument('--mean', type=str, help='mean of dataset in path in form of str tuple')
-    # parser.add_argument('--std', type=str, help='std of dataset in path in form of str tuple')
-    # parser.add_argument('--data_folder', type=str, default=None, help='path to custom dataset')
-    # parser.add_argument('--size', type=int, default=32, help='parameter for RandomResizedCrop')
-
-    # # method
-    # parser.add_argument('--method', type=str, default='SupCon',
-    #                     choices=['SupCon', 'SimCLR'], help='choose method')
-
-    # # temperature
-    # parser.add_argument('--temp', type=float, default=0.07,
-    #                     help='temperature for loss function')
-
-    # # other setting
-    # parser.add_argument('--cosine', action='store_true',
-    #                     help='using cosine annealing')
-    # parser.add_argument('--syncBN', action='store_true',
-    #                     help='using synchronized batch normalization')
-    # parser.add_argument('--warm', action='store_true',
-    #                     help='warm-up for large batch training')
-    # parser.add_argument('--trial', type=str, default='0',
-    #                     help='id for recording multiple runs')
-
     args = parser.parse_args()
 
 
