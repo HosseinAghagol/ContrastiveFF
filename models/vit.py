@@ -50,9 +50,6 @@ class PatchingLayer(nn.Module):
         x = x.flatten(1,2)
         x = x.flatten(2, 4)
  
-        if y!=None:
-            if self.flag: self.set_label_rep(x)
-            x = torch.cat([self.labels[y], x], dim=1)
         return x
     
 
@@ -103,11 +100,11 @@ class ViT(nn.Module):
     def __init__(self, args):
         super().__init__()
 
-        self.patching_layer = PatchingLayer(args)
         self.layers = nn.ModuleList()
 
         # First layer
         self.layers.append(nn.Sequential(
+          PatchingLayer(args),
           nn.Linear(3*(args.patch_size**2), args.E),
           nn.ReLU(),
           PositionalEncoder(args),
