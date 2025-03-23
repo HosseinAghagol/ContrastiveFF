@@ -18,6 +18,7 @@ def parse_option():
     parser = argparse.ArgumentParser('argument for training')
 
     parser.add_argument('--data', type=str, default='cifar10',choices=['cifar10', 'cifar100','tiny_imagenet'], help='set data')
+    parser.add_argument('--model', type=str, default='vit',choices=['vit', 'swin'], help='set model')
     parser.add_argument('--batch_size', type=int, default=512, help='batch_size')
     parser.add_argument('--epochs1', type=int, default=600, help='number of training epochs')
     parser.add_argument('--epochs2', type=int, default=50, help='number of training epochs')
