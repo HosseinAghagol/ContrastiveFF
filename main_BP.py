@@ -68,7 +68,14 @@ def main():
     loaders = set_loaders(opt)
 
     # build model and criterion
-    model = ViT(opt).to('cuda')
+    if opt.model=='vit':
+        model = ViT(opt).to('cuda')
+    elif opt.model=='swin':
+        from models.swin import swin_t
+        model = swin_t(window_size=opt.patch_size,
+                num_classes=10,
+                downscaling_factors=(2,2,2,1)).to('cuda')
+
     loss_valid_min = np.inf
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=opt.lr2)
