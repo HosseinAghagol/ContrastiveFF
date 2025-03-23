@@ -28,7 +28,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
 
     for batch in loader:
 
-        x1, x2  = model.patching_layer(batch[0][0].to('cuda')), model.patching_layer(batch[0][1].to('cuda'))
+        x1, x2  = batch[0][0].to('cuda'), batch[0][1].to('cuda')
         targets = batch[1].to('cuda')
         n += len(targets)
 
@@ -56,7 +56,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, args, phase='train'):
     torch.set_grad_enabled(True if phase=='train' else False)
     for batch in loader:
 
-        features = model.patching_layer(batch[0][0].to('cuda'))
+        features = batch[0][0].to('cuda')
         targets  = batch[1].to('cuda')
         n += len(targets)
 
@@ -92,7 +92,7 @@ def eval(test_loader, model, args):
     torch.set_grad_enabled(False)
     for batch in test_loader:
 
-        features = model.patching_layer(batch[0].to('cuda'))
+        features = batch[0].to('cuda')
         targets  = batch[1].to('cuda')
         n += len(targets)
 

@@ -13,7 +13,7 @@ from utils import set_optimizers
 from utils import save_model,load_model
 from utils import set_loaders
 
-from models.vit import ViT
+from models.vit_ff import ViT
 from losses import FFLoss, SymBaLoss
 
 
@@ -33,11 +33,11 @@ def one_epoch_stage1(loader, model, criterion, optimizers, opt, phase='train'):
 
     for batch in loader:
         x = batch[0].to('cuda')
-        
+
         y_pos = batch[1].to('cuda')
         y_neg = wrong(opt,y_pos)
-
         n += len(y_pos)
+        
         x_pos = model.patching_layer(x, y_pos)
         x_neg = model.patching_layer(x, y_neg)
 
@@ -67,14 +67,11 @@ def one_epoch_stage2(loader, model, criterion, optimizer, opt, phase='train'):
 
     model.train() if phase=='train' else model.eval()
     torch.set_grad_enabled(True if phase=='train' else False)
+
     for batch in loader:
-        if opt.one_forward:
-            features = batch[0].to('cuda')
-        else:
-            features = batch[0][0].to('cuda')
 
-        targets = batch[1].to('cuda')
-
+        features = batch[0].to('cuda')
+        targets  = batch[1].to('cuda')
         n += len(targets)
 
         # Extracting feature
