@@ -99,7 +99,7 @@ def eval(test_loader, model, args):
         # Extracting feature
         for l in range(args.L): features = model.layers[l](features)
         # Classifier head
-        output = model.classifier_head(features.mean(1))
+        output = model.classifier_head(features.mean([2,3]))
         _, pred = output.topk(args.eval_mode, 1, True, True)
         num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
