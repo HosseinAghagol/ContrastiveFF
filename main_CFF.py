@@ -35,8 +35,9 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         for l in range(args.L):
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
-            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
             print(x1.shape)
+            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+            
             print(x1.mean(1).shape)
 
             if phase=='train':
