@@ -36,7 +36,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             print(x1.shape)
-            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+            loss = criterions[l]([torch.flatten(x1.mean(1)),torch.flatten(x2.mean(1))], targets)
             
             print(x1.mean(1).shape)
 
