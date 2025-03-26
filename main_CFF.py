@@ -36,6 +36,8 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+            print(x1.shape)
+            print(x1.mean(1).shape)
 
             if phase=='train':
                 optimizers[l].zero_grad()
@@ -124,6 +126,7 @@ def main():
         model = swin_t(window_size=args.patch_size,
                 num_classes=10,
                 downscaling_factors=(2,2,2,1)).to('cuda')
+        args.L = len(model.layers)
 
     # build optimizer
     optimizers = set_optimizers(model, args)
