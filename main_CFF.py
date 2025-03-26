@@ -117,8 +117,13 @@ def main():
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
 
-    # build model and criterion
-    model = ViT(args).to('cuda')
+    if args.model=='vit':
+        model = ViT(args).to('cuda')
+    elif args.model=='swin':
+        from models.swin import swin_t
+        model = swin_t(window_size=args.patch_size,
+                num_classes=10,
+                downscaling_factors=(2,2,2,1)).to('cuda')
 
     # build optimizer
     optimizers = set_optimizers(model, args)
