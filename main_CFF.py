@@ -120,8 +120,8 @@ def main():
     if args.model=='vit':
         model = ViT(args).to('cuda')
     elif args.model=='swin':
-        from models.swin import swin_t
-        model = swin_t(window_size=args.patch_size,
+        from models.swin import swin_s
+        model = swin_s(window_size=args.patch_size,
                 num_classes=10,
                 downscaling_factors=(2,2,2,1)).to('cuda')
         args.L = len(model.layers)
