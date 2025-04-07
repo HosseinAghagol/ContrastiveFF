@@ -35,7 +35,7 @@ def parse_option():
     parser.add_argument('--randaug', action='store_true', help='')
     parser.add_argument('--resume', action='store_true', help='')
     parser.add_argument('--mtype', type=str, default='linear', choices=['linear', 'parabolic','cosine'], help='')
-    parser.add_argument('--k', type=int, default=1, help='')
+    parser.add_argument('--k', type=float, default=1, help='')
     parser.add_argument('--on_ram', action='store_true', help='')
     parser.add_argument('--trial', type=int, default=1, help='')
     parser.add_argument('--threshold', type=int, default=2, help='')
