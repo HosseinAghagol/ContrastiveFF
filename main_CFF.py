@@ -12,6 +12,8 @@ from utils import parse_option
 from utils import set_optimizers
 from utils import save_model,load_model
 from utils import set_loaders
+from utils import set_margins
+
 
 from models.vit import ViT
 from losses import SupMCon
@@ -117,18 +119,11 @@ def main():
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
 
-    if args.model=='vit':
-        model = ViT(args).to('cuda')
-    elif args.model=='swin':
-        from models.swin import swin_s
-        model = swin_s(window_size=args.patch_size,
-                num_classes=10,
-                downscaling_factors=(2,2,2,1)).to('cuda')
-        args.L = len(model.layers)
+    model = ViT(args).to('cuda')
 
     # build optimizer
     optimizers = set_optimizers(model, args)
-    positive_margin = np.linspace(args.m0, args.mL, args.L)
+    positive_margin = set_margins(args)
 
     criterions = [SupMCon(args, positive_margin[l]) for l in range(len(model.layers))]
     if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(len(model.layers))]

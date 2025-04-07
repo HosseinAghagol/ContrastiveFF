@@ -24,7 +24,7 @@ def parse_option():
     parser.add_argument('--epochs2', type=int, default=50, help='number of training epochs')
     parser.add_argument('--E', type=int, default=128, help='')
     parser.add_argument('--H', type=int, default=4, help='')
-    parser.add_argument('--L', type=int, default=6, help='')
+    parser.add_argument('--L', type=int, default=5, help='')
     parser.add_argument('--patch_size', type=int, default=4, help='')
     parser.add_argument('--lr1', type=float, default=0.004, help='learning rate stage 1')
     parser.add_argument('--lr2', type=float, default=0.0005, help='learning rate stage 2')
@@ -34,7 +34,8 @@ def parse_option():
     parser.add_argument('--mL', type=float, default=0.1, help='')
     parser.add_argument('--randaug', action='store_true', help='')
     parser.add_argument('--resume', action='store_true', help='')
-    parser.add_argument('--non_linear_m', action='store_true', help='')
+    parser.add_argument('--mtype', type=str, default='linear', choices=['linear', 'parabolic','cosine'], help='')
+    parser.add_argument('--k', type=int, default=1, help='')
     parser.add_argument('--on_ram', action='store_true', help='')
     parser.add_argument('--trial', type=int, default=1, help='')
     parser.add_argument('--threshold', type=int, default=2, help='')
@@ -266,3 +267,10 @@ def load_model(model, optimizers):
     loss_min = checkpoint['loss_min']
     
     return model, optimizers, epoch, loss_min
+
+def set_margins(args):
+    if args.mtype =='linear':
+        return np.linspace(args.m0, args.mL, args.L)
+    elif args.mtype=='parabolic':
+        return (np.linspace(args.m0, args.mL, args.L)- args.m0**(1/(2*args.k)))**(2*args.k)
+    
