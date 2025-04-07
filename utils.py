@@ -274,4 +274,7 @@ def set_margins(args):
     elif args.mtype=='parabolic':
         t = (args.m0-args.mL)**(1/(2*args.k))
         return (np.linspace(0, args.L-1, args.L)/((args.L-1)/t)- t)**(2*args.k) + args.mL
+    elif args.mtype=='cosine':
+        t = np.cos((np.linspace(0, args.L-1, args.L)**args.k)/((args.L-1)**args.k))
+        return 0.5*args.m0*(t+1)
     
