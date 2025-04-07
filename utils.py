@@ -272,6 +272,6 @@ def set_margins(args):
     if args.mtype =='linear':
         return np.linspace(args.m0, args.mL, args.L)
     elif args.mtype=='parabolic':
-        t = (args.m0-1)**(1/(2*args.k))
+        t = (args.m0-0.1)**(1/(2*args.k))
         return (np.linspace(0, args.L-1, args.L)/(args.L/t)- t)**(2*args.k) + args.m0
     
