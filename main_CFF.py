@@ -124,7 +124,7 @@ def main():
     # build optimizer
     optimizers = set_optimizers(model, args)
     positive_margin = set_margins(args)
-
+    print(positive_margin)
     criterions = [SupMCon(args, positive_margin[l]) for l in range(len(model.layers))]
     if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(len(model.layers))]
 
