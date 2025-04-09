@@ -277,4 +277,6 @@ def set_margins(args):
     elif args.mtype=='cosine':
         t = np.cos(np.pi*(np.linspace(0, args.L-1, args.L)**args.k)/((args.L-1)**args.k))
         return 0.5*(args.m0-args.mL)*(t+1)+args.mL
-    
+    elif args.mtype=='exponential':
+        t = (np.linspace(0, args.L-1, args.L)/(args.L-1))**args.k
+        return args.m0*(0.1/args.m0)**t
