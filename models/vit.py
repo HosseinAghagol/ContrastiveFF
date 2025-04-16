@@ -27,10 +27,10 @@ def img_to_patch(x, patch_size):
 
 class PatchingLayer(nn.Module):
     
-    def __init__(self,args):
+    def __init__(self,opt):
         super().__init__()
-        self.patch_size = args.patch_size
-        self.num_class  = args.num_class
+        self.patch_size = opt.patch_size
+        self.num_class  = opt.num_class
         self.flag = True
         
     def set_label_rep(self,x):
@@ -50,15 +50,18 @@ class PatchingLayer(nn.Module):
         x = x.flatten(1,2)
         x = x.flatten(2, 4)
  
+        if y!=None:
+            if self.flag: self.set_label_rep(x)
+            x = torch.cat([self.labels[y], x], dim=1)
         return x
     
 
 class PositionalEncoder(nn.Module):
     
-    def __init__(self,args):
+    def __init__(self,opt):
         super().__init__()
         # Learnable parameters for position embedding
-        self.pos_embed   = nn.Parameter(torch.randn((1, args.num_patches, args.E)))
+        self.pos_embed   = nn.Parameter(torch.randn((1, opt.num_patches, opt.E)))
 
 
     def forward(self, x):
@@ -97,26 +100,26 @@ class ViTEncoder(nn.Module):
 
 
 class ViT(nn.Module):
-    def __init__(self, args):
+    def __init__(self, opt):
         super().__init__()
 
+        self.patching_layer = PatchingLayer(opt)
         self.layers = nn.ModuleList()
 
         # First layer
         self.layers.append(nn.Sequential(
-          PatchingLayer(args),
-          nn.Linear(3*(args.patch_size**2), args.E),
+          nn.Linear(3*(opt.patch_size**2), opt.E),
           nn.ReLU(),
-          PositionalEncoder(args),
-          ViTEncoder(args.E, args.E*2, args.H)
+          PositionalEncoder(opt),
+          ViTEncoder(opt.E, opt.E*2, opt.H)
         ))
         
         # Another layers
-        self.layers.extend([ViTEncoder(args.E, args.E*2, args.H) for _ in range(1,args.L)])
+        self.layers.extend([ViTEncoder(opt.E, opt.E*2, opt.H) for _ in range(1,opt.L)])
             
         # Classification head
-        self.classifier_head = nn.Sequential(nn.LayerNorm(args.E),
-                                             nn.Linear(args.E, args.num_class))
+        self.classifier_head = nn.Sequential(nn.LayerNorm(opt.E),
+                                             nn.Linear(opt.E, opt.num_class))
 
     def forward(self, x):
         # Encoding
