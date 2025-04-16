@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 
 from timm.models._efficientnet_blocks import SqueezeExcite, DepthwiseSeparableConv
-from timm.models.layers import drop_path, trunc_normal_, Mlp, DropPath
+from timm.layers import drop_path, trunc_normal_, Mlp, DropPath
 
 
 def _gelu_ignore_parameters(
@@ -487,6 +487,8 @@ class MaxViTBlock(nn.Module):
         Returns:
             output (torch.Tensor): Output tensor of the shape [B, C_out, H // 2, W // 2] (downscaling is optional)
         """
+        print(input.shape)
+        o= self.mb_conv(input)
         output = self.grid_transformer(self.block_transformer(self.mb_conv(input)))
         return output
 
