@@ -12,8 +12,8 @@ from typing import Type, Callable, Tuple, Optional, Set, List, Union
 import torch
 import torch.nn as nn
 
-from timm.models.efficientnet_blocks import SqueezeExcite, DepthwiseSeparableConv
-from timm.models.layers import drop_path, trunc_normal_, Mlp, DropPath
+from timm.models._efficientnet_blocks import SqueezeExcite, DepthwiseSeparableConv
+from timm.layers import drop_path, trunc_normal_, Mlp, DropPath
 
 
 def _gelu_ignore_parameters(
