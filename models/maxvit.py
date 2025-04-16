@@ -489,7 +489,7 @@ class MaxViTBlock(nn.Module):
         """
         print(input.shape)
         o= self.mb_conv(input)
-        output = self.grid_transformer(self.block_transformer(self.mb_conv(input)))
+        output = self.grid_transformer(self.block_transformer(o))
         return output
 
 
