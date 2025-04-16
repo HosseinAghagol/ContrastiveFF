@@ -14,7 +14,7 @@ from utils import save_model,load_model
 from utils import set_loaders
 from utils import set_margins
 
-from models.vit import ViT
+from models.maxvit import max_vit_small_224
 from losses import SupMCon
 
 
@@ -120,7 +120,7 @@ def main():
     loaders = set_loaders(args)
 
     # build model and criterion
-    model = ViT(args).to('cuda')
+    model = max_vit_small_224().to('cuda')
 
     # build optimizer
     optimizers = set_optimizers(model, args)
