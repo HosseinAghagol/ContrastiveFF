@@ -14,7 +14,6 @@ from utils import save_model,load_model
 from utils import set_loaders
 from utils import set_margins
 
-
 from models.vit import ViT
 from losses import SupMCon
 
@@ -30,7 +29,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
 
     for batch in loader:
 
-        x1, x2  = batch[0][0].to('cuda'), batch[0][1].to('cuda')
+        x1, x2  = model.patching_layer(batch[0][0].to('cuda')), model.patching_layer(batch[0][1].to('cuda'))
         targets = batch[1].to('cuda')
         n += len(targets)
 
@@ -38,7 +37,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
-            
+
             if phase=='train':
                 optimizers[l].zero_grad()
                 loss.backward()
@@ -58,7 +57,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, args, phase='train'):
     torch.set_grad_enabled(True if phase=='train' else False)
     for batch in loader:
 
-        features = batch[0][0].to('cuda')
+        features = model.patching_layer(batch[0][0].to('cuda'))
         targets  = batch[1].to('cuda')
         n += len(targets)
 
@@ -94,7 +93,7 @@ def eval(test_loader, model, args):
     torch.set_grad_enabled(False)
     for batch in test_loader:
 
-        features = batch[0].to('cuda')
+        features = model.patching_layer(batch[0].to('cuda'))
         targets  = batch[1].to('cuda')
         n += len(targets)
 
@@ -119,12 +118,13 @@ def main():
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
 
+    # build model and criterion
     model = ViT(args).to('cuda')
 
     # build optimizer
     optimizers = set_optimizers(model, args)
     positive_margin = set_margins(args)
-    print(positive_margin)
+
     criterions = [SupMCon(args, positive_margin[l]) for l in range(len(model.layers))]
     if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(len(model.layers))]
 
