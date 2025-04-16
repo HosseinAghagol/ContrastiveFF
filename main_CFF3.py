@@ -32,7 +32,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         x1, x2  = batch[0][0].to('cuda'), batch[0][1].to('cuda')
         targets = batch[1].to('cuda')
         n += len(targets)
-
+        print(x1.shape)
         for l in range(args.L):
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
