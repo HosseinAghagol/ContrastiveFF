@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 
 from timm.models._efficientnet_blocks import SqueezeExcite, DepthwiseSeparableConv
-from timm.layers import drop_path, trunc_normal_, Mlp, DropPath
+from timm.models.layers import drop_path, trunc_normal_, Mlp, DropPath
 
 
 def _gelu_ignore_parameters(
@@ -104,6 +104,7 @@ class MBConv(nn.Module):
         Returns:
             output (torch.Tensor): Output tensor of the shape [B, C_out, H (// 2), W (// 2)] (downscaling is optional).
         """
+        print(input.shape)
         output = self.main_path(input)
         if self.drop_path_rate > 0.:
             output = drop_path(output, self.drop_path_rate, self.training)
