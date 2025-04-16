@@ -121,6 +121,7 @@ def main():
 
     # build model and criterion
     model = max_vit_small_224().to('cuda')
+    args.L = len(model.layers)
 
     # build optimizer
     optimizers = set_optimizers(model, args)
