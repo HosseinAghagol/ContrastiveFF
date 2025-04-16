@@ -14,7 +14,7 @@ from utils import save_model,load_model
 from utils import set_loaders
 from utils import set_margins
 
-from models.maxvit import max_vit_small_224
+from models.maxvit import MaxViT
 from losses import SupMCon
 
 
@@ -120,7 +120,18 @@ def main():
     loaders = set_loaders(args)
 
     # build model and criterion
-    model = max_vit_small_224().to('cuda')
+    model = MaxViT(
+                    num_classes = 1000,
+                    dim_conv_stem = 64,               # dimension of the convolutional stem, would default to dimension of first layer if not specified
+                    dim = 96,                         # dimension of first layer, doubles every layer
+                    dim_head = 32,                    # dimension of attention heads, kept at 32 in paper
+                    depth = (2, 2, 5, 2),             # number of MaxViT blocks per stage, which consists of MBConv, block-like attention, grid-like attention
+                    window_size = 7,                  # window size for block and grids
+                    mbconv_expansion_rate = 4,        # expansion rate of MBConv
+                    mbconv_shrinkage_rate = 0.25,     # shrinkage rate of squeeze-excitation in MBConv
+                    dropout = 0.1                     # dropout
+                )
+
     args.L = len(model.layers)
 
     # build optimizer
