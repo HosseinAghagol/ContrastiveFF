@@ -143,9 +143,9 @@ def set_loaders(args):
         train_transform = transforms.Compose(train_transform)
         test_transform = transforms.Compose([v2.ToDtype(torch.float32, scale=True),
                                             v2.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
-    
-        train_dataset = datasets.CIFAR10('./data/',train=True,transform=transforms.Compose([v2.Resize((224,224)),v2.ToImage()]),download=True)
-        test_dataset  = datasets.CIFAR10('./data/',train=False,transform=transforms.Compose([v2.Resize((224,224)),v2.ToImage()]),download=True)
+        #v2.Resize((224,224))
+        train_dataset = datasets.CIFAR10('./data/',train=True,transform=transforms.Compose([v2.ToImage()]),download=True)
+        test_dataset  = datasets.CIFAR10('./data/',train=False,transform=transforms.Compose([v2.ToImage()]),download=True)
 
         args.patch_size  = 4
         args.num_patches = int((32**2) / (args.patch_size**2))
