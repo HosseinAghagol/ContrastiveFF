@@ -36,7 +36,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             print(x1.shape)
-            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+            loss = criterions[l]([x1.mean([2,3]),x2.mean([2,3])], targets)
 
             if phase=='train':
                 optimizers[l].zero_grad()
@@ -69,7 +69,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, args, phase='train'):
         # Classifier head
         model.train() if phase=='train' else model.eval()
         torch.set_grad_enabled(True if phase=='train' else False)
-        outputs = model.classifier_head(features.mean(1).detach())
+        outputs = model.classifier_head(features.mean([2,3]).detach())
         loss   = criterion(outputs, targets)
 
         if phase=='train':
@@ -100,7 +100,7 @@ def eval(test_loader, model, args):
         # Extracting feature
         for l in range(args.L): features = model.layers[l](features)
         # Classifier head
-        output = model.classifier_head(features.mean(1))
+        output = model.classifier_head(features.mean([2,3]))
         _, pred = output.topk(args.eval_mode, 1, True, True)
         num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
