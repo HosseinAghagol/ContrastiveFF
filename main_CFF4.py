@@ -14,7 +14,7 @@ from utils import save_model,load_model
 from utils import set_loaders
 from utils import set_margins
 
-from models.cct import cct_6
+from models.cct import cct_8
 from losses import SupMCon
 
 
@@ -119,7 +119,7 @@ def main():
     # build data loader
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
-    model = cct_6(
+    model = cct_8(
         img_size=32,               # CIFAR‑10 images are 32×32
         n_conv_layers=2,           # the example uses two small conv blocks
         kernel_size=3,             # 3×3 conv kernels preserve locality on tiny images
@@ -129,7 +129,7 @@ def main():
         pooling_stride=2,          # halve spatial dims to 16×16
         pooling_padding=1,         # “same” padding around the pooling window
         num_classes=10,            # CIFAR‑10 has 10 target classes
-        positional_embedding='learnable'
+        positional_embedding='sine'
     ).to('cuda')
     # build model and criterion
     # model = cct_6(
