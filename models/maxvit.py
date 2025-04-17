@@ -254,7 +254,7 @@ class MaxViT(nn.Module):
                 is_first = block_ind == 0
                 stage_dim_in = layer_dim_in if is_first else layer_dim
                 block = []
-                if stage_ind==0: block += [self.conv_stem]
+                if stage_ind==0 and is_first: block += [self.conv_stem]
                 block += [
                     MBConv(
                         stage_dim_in,
