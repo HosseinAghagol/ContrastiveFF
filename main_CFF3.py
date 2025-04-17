@@ -130,7 +130,7 @@ def main():
                     mbconv_expansion_rate = 4,        # expansion rate of MBConv
                     mbconv_shrinkage_rate = 0.25,     # shrinkage rate of squeeze-excitation in MBConv
                     dropout = 0.1                     # dropout
-                )
+                ).to('cuda')
 
     args.L = len(model.layers)
 
