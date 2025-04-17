@@ -59,7 +59,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, args, phase='train'):
     torch.set_grad_enabled(True if phase=='train' else False)
     for batch in loader:
 
-        features = model.batch[0][0].to('cuda')
+        features = batch[0][0].to('cuda')
         targets  = batch[1].to('cuda')
         n += len(targets)
 
