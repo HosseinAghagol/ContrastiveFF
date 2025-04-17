@@ -133,8 +133,8 @@ def main():
     optimizers = set_optimizers(model, args)
     positive_margin = set_margins(args)
 
-    criterions = [SupMCon(args, positive_margin[l]) for l in range(len(args.L))]
-    if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(len(args.L))]
+    criterions = [SupMCon(args, positive_margin[l]) for l in range(args.L)]
+    if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(args.L)]
 
     loss_valid_min = np.inf
     
