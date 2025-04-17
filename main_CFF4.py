@@ -36,7 +36,10 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model(x1.detach(),l)
             x2 = model(x2.detach(),l)
             print(x2.shape)
-            loss = criterions[l]([x1.mean([1]),x2.mean([1])], targets)
+            if l ==args.L-1:
+                loss = criterions[l]([x1,x2], targets)
+            else:
+                loss = criterions[l]([x1.mean([1]),x2.mean([1])], targets)
 
             if phase=='train':
                 optimizers[l].zero_grad()
@@ -117,31 +120,31 @@ def main():
     # build data loader
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
-    # cct = cct_6(
-    #     img_size=32,               # CIFAR‑10 images are 32×32
-    #     n_conv_layers=2,           # the example uses two small conv blocks
-    #     kernel_size=3,             # 3×3 conv kernels preserve locality on tiny images
-    #     stride=1,                  # no aggressive down‐sampling in the stem
-    #     padding=1,                 # pad so conv output stays 32×32 before pooling
-    #     pooling_kernel_size=3,     # 3×3 max‐pool
-    #     pooling_stride=2,          # halve spatial dims to 16×16
-    #     pooling_padding=1,         # “same” padding around the pooling window
-    #     num_classes=10,            # CIFAR‑10 has 10 target classes
-    #     positional_embedding='learnable'
-    # )
-    # build model and criterion
     model = cct_6(
-        img_size = 224,
-        n_conv_layers = 1,
-        kernel_size = 7,
-        stride = 2,
-        padding = 3,
-        pooling_kernel_size = 3,
-        pooling_stride = 2,
-        pooling_padding = 1,
-        num_classes = 10,
-        positional_embedding = 'sine', # ['sine', 'learnable', 'none']
-        ).to('cuda')
+        img_size=32,               # CIFAR‑10 images are 32×32
+        n_conv_layers=2,           # the example uses two small conv blocks
+        kernel_size=3,             # 3×3 conv kernels preserve locality on tiny images
+        stride=1,                  # no aggressive down‐sampling in the stem
+        padding=1,                 # pad so conv output stays 32×32 before pooling
+        pooling_kernel_size=3,     # 3×3 max‐pool
+        pooling_stride=2,          # halve spatial dims to 16×16
+        pooling_padding=1,         # “same” padding around the pooling window
+        num_classes=10,            # CIFAR‑10 has 10 target classes
+        positional_embedding='learnable'
+    ).to('cuda')
+    # build model and criterion
+    # model = cct_6(
+    #     img_size = 224,
+    #     n_conv_layers = 1,
+    #     kernel_size = 7,
+    #     stride = 2,
+    #     padding = 3,
+    #     pooling_kernel_size = 3,
+    #     pooling_stride = 2,
+    #     pooling_padding = 1,
+    #     num_classes = 10,
+    #     positional_embedding = 'sine', # ['sine', 'learnable', 'none']
+    #     ).to('cuda')
     # model = nn.DataParallel(model)
     args.L = len(model.layers)
 
