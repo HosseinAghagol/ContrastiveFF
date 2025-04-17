@@ -33,6 +33,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         targets = batch[1].to('cuda')
         n += len(targets)
         for l in range(args.L):
+            print(l)
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             loss = criterions[l]([x1.mean([2,3]),x2.mean([2,3])], targets)
