@@ -131,7 +131,7 @@ def main():
                     mbconv_shrinkage_rate = 0.25,     # shrinkage rate of squeeze-excitation in MBConv
                     dropout = 0.1                     # dropout
                 ).to('cuda')
-
+    model = nn.DataParallel(model)
     args.L = len(model.layers)
 
     # build optimizer
