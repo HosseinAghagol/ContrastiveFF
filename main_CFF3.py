@@ -35,7 +35,6 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         for l in range(args.L):
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
-            print(x1.shape)
             loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
 
             if phase=='train':
@@ -130,7 +129,7 @@ def main():
                     mbconv_shrinkage_rate = 0.25,     # shrinkage rate of squeeze-excitation in MBConv
                     dropout = 0.1                     # dropout
                 ).to('cuda')
-    model = nn.DataParallel(model)
+    # model = nn.DataParallel(model)
     args.L = len(model.layers)
 
     # build optimizer
