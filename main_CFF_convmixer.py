@@ -37,7 +37,7 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
             print(x1.shape)
-            loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
+            loss = criterions[l]([x1.mean([2,3]),x2.mean([2,3])], targets)
 
             if phase=='train':
                 optimizers[l].zero_grad()
@@ -120,7 +120,7 @@ def main():
     loaders = set_loaders(args)
 
     # build model and criterion
-    model = ConvMixer(256, 16, kernel_size=8, patch_size=4, n_classes=10).to('cuda')
+    model = ConvMixer(256, 16, kernel_size=3, patch_size=4, n_classes=10).to('cuda')
     args.L = len(model.layers)
     # build optimizer
     optimizers = set_optimizers(model, args)
