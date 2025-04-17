@@ -35,7 +35,6 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         for l in range(args.L):
             x1 = model(x1.detach(),l)
             x2 = model(x2.detach(),l)
-            print(x2.shape)
             if l ==args.L-1:
                 loss = criterions[l]([x1,x2], targets)
             else:
