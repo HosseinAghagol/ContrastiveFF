@@ -347,7 +347,12 @@ class CCT(nn.Module):
             attention_dropout=0.1,
             stochastic_depth=0.1,
             *args, **kwargs)
+        self.layers = self.classifier.layers
+        self.classifier_head = self.classifier.classifier_head
+    def forward(self, x,l):
+        if l==0:
+            x = self.tokenizer(x)
+            x = self.classifier(x,l)
+        else: x = self.classifier(x,l)
 
-    def forward(self, x):
-        x = self.tokenizer(x)
-        return self.classifier(x)
+        return x
