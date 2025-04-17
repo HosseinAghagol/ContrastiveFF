@@ -275,7 +275,7 @@ class MaxViT(nn.Module):
                 ]
 
                 self.blocks.append(nn.Sequential(*block))
-            self.layers.append(self.blocks)
+            self.layers.append(nn.Sequential(*self.blocks))
         # mlp head out
 
         self.mlp_head = nn.Sequential(
