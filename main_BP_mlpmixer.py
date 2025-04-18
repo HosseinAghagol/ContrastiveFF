@@ -72,7 +72,7 @@ def main():
     model = MLPMixer(
                     image_size = 32,
                     channels = 3,
-                    patch_size = args.patch_size,
+                    patch_size = opt.patch_size,
                     dim = 512,
                     depth = 8,
                     num_classes = 10
