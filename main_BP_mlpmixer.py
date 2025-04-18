@@ -22,7 +22,7 @@ def one_epoch(loader, model, criterion, optimizer, phase='train'):
         features, targets = batch[0].to('cuda'), batch[1].to('cuda')
         n += len(targets)
 
-        outputs = model(features)
+        outputs = model(model.patching_layer(features))
         loss    = criterion(outputs, targets)
 
         if phase=='train':
@@ -50,7 +50,7 @@ def eval(test_loader, model, opt):
         targets  = batch[1].to('cuda')
         n += len(targets)
 
-        output = model(features)
+        output = model(model.patching_layer(features))
         _, pred = output.topk(opt.eval_mode, 1, True, True)
         num_corrects += pred.eq(targets.view(-1, 1).expand_as(pred)).reshape(-1).float().sum(0, keepdim=True)
 
