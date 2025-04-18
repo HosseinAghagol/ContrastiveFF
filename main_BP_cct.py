@@ -67,14 +67,18 @@ def main():
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(opt)
 
-    # build model and criterion
-    if opt.model=='vit':
-        model = ViT(opt).to('cuda')
-    elif opt.model=='swin':
-        from models.swin import swin_t
-        model = swin_t(window_size=opt.patch_size,
-                num_classes=10,
-                downscaling_factors=(2,2,2,1)).to('cuda')
+    model = cct_8(
+        img_size=32,               # CIFAR‑10 images are 32×32
+        n_conv_layers=2,           # the example uses two small conv blocks
+        kernel_size=3,             # 3×3 conv kernels preserve locality on tiny images
+        stride=1,                  # no aggressive down‐sampling in the stem
+        padding=1,                 # pad so conv output stays 32×32 before pooling
+        pooling_kernel_size=3,     # 3×3 max‐pool
+        pooling_stride=2,          # halve spatial dims to 16×16
+        pooling_padding=1,         # “same” padding around the pooling window
+        num_classes=10,            # CIFAR‑10 has 10 target classes
+        positional_embedding='sine'
+    ).to('cuda')
 
     loss_valid_min = np.inf
     
