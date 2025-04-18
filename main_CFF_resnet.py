@@ -32,13 +32,11 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         x1, x2  = batch[0][0].to('cuda'), batch[0][1].to('cuda')
         targets = batch[1].to('cuda')
         n += len(targets)
+
         for l in range(args.L):
-            x1 = model(x1.detach(),l)
-            x2 = model(x2.detach(),l)
-            if l ==args.L-1:
-                loss = criterions[l]([x1,x2], targets)
-            else:
-                loss = criterions[l]([x1.mean([2,3]),x2.mean([2,3])], targets)
+            x1 = model.layers[l](x1.detach())
+            x2 = model.layers[l](x2.detach())
+            loss = criterions[l]([x1.mean([2,3]),x2.mean([2,3])], targets)
 
             if phase=='train':
                 optimizers[l].zero_grad()
@@ -66,7 +64,7 @@ def one_epoch_stage2(loader, model, criterion, optimizer, args, phase='train'):
         # Extracting feature
         model.eval()
         with torch.no_grad():
-            for l in range(args.L): features = model(features,l)
+            for l in range(args.L): features = model.layers[l](features)
 
         # Classifier head
         model.train() if phase=='train' else model.eval()
@@ -100,7 +98,7 @@ def eval(test_loader, model, args):
         n += len(targets)
 
         # Extracting feature
-        for l in range(args.L): features = model(features,l)
+        for l in range(args.L): features = model.layers[l](features)
         # Classifier head
         output = model.classifier_head(features)
         _, pred = output.topk(args.eval_mode, 1, True, True)
@@ -119,15 +117,16 @@ def main():
     # build data loader
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(args)
+
+    # build model and criterion
     model = resnet34().to('cuda')
     args.L = len(model.layers)
-
     # build optimizer
     optimizers = set_optimizers(model, args)
     positive_margin = set_margins(args)
 
-    criterions = [SupMCon(args, positive_margin[l]) for l in range(len(model.layers))]
-    if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(len(model.layers))]
+    criterions = [SupMCon(args, positive_margin[l]) for l in range(args.L)]
+    if args.m0 ==0: criterions = [SupMCon(args, 0) for l in range(args.L)]
 
     loss_valid_min = np.inf
     
