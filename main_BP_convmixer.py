@@ -68,7 +68,7 @@ def main():
     print('\n################## Preparing data ##################\n')
     loaders = set_loaders(opt)
 
-    model = ConvMixer(256, 16, kernel_size=3, patch_size=4, n_classes=10).to('cuda')
+    model = ConvMixer(256, 16, kernel_size=7, patch_size=4, n_classes=10).to('cuda')
 
     loss_valid_min = np.inf
     

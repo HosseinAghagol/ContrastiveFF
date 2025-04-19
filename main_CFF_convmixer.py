@@ -119,7 +119,7 @@ def main():
     loaders = set_loaders(args)
 
     # build model and criterion
-    model = ConvMixer(256, 16, kernel_size=3, patch_size=4, n_classes=10).to('cuda')
+    model = ConvMixer(256, 16, kernel_size=7, patch_size=4, n_classes=10).to('cuda')
     args.L = len(model.layers)
     # build optimizer
     optimizers = set_optimizers(model, args)
