@@ -123,7 +123,7 @@ def main():
                     image_size = 32,
                     channels = 3,
                     patch_size = args.patch_size,
-                    dim = 768,
+                    dim = 1024,
                     depth = 6,
                     num_classes = 10
                     ).to('cuda')
