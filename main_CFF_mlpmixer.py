@@ -124,7 +124,7 @@ def main():
                     channels = 3,
                     patch_size = args.patch_size,
                     dim = 768,
-                    depth = 8,
+                    depth = 6,
                     num_classes = 10
                     ).to('cuda')
     args.L = len(model.layers)
