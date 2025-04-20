@@ -36,7 +36,6 @@ def one_epoch_stage1(loader, model, criterions, optimizers, args, phase='train')
         for l in range(args.L):
             x1 = model.layers[l](x1.detach())
             x2 = model.layers[l](x2.detach())
-            print(x2.shape)
             loss = criterions[l]([x1.mean(1),x2.mean(1)], targets)
 
             if phase=='train':
@@ -124,7 +123,7 @@ def main():
                     image_size = 32,
                     channels = 3,
                     patch_size = args.patch_size,
-                    dim = 1024,
+                    dim = 256,
                     depth = 6,
                     num_classes = 10
                     ).to('cuda')
