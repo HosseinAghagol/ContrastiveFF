@@ -41,14 +41,6 @@ CFF has been evaluated on four benchmark datasets: **MNIST, CIFAR-10, CIFAR-100,
 
 ---
 
-## 🛠 Prerequisites
-The experiments in the paper were implemented using:
-*   **Framework:** PyTorch
-*   **Optimizer:** AdamW
-*   **Architectures:** ViT, MLP, Swin-T, ResNet, MLP-Mixer, and Conv-Mixer
-
----
-
 ## 📑 Citation
 If you find this work useful for your research, please cite the original paper:
 
@@ -67,6 +59,6 @@ If you find this work useful for your research, please cite the original paper:
 ---
 
 ## 📧 Contact
-**Hossein Aghagolzadeh** - ho.golzadeh@stu.nit.ac.ir  
+**Hossein Aghagolzadeh** - hossein.aghagol@gmail.com, ho.golzadeh@stu.nit.ac.ir  
 **Mehdi Ezoji** - m.ezoji@nit.ac.ir  
 *Faculty of Electrical and Computer Engineering, Babol Noshirvani University of Technology, Babol, Iran*
