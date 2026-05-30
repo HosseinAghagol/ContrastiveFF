@@ -8,7 +8,7 @@ This repository contains the official implementation of **Contrastive Forward-Fo
 ## 📌 Overview
 Backpropagation (BP) is the standard for training neural networks but lacks biological plausibility due to its global nature and memory requirements. The **Forward-Forward (FF)** algorithm was recently introduced as a brain-inspired alternative, but it often suffers from a performance gap compared to BP.
 
-**Contrastive Forward-Forward (CFF)** bridges this gap by combining the layer-wise independence of the FF algorithm with the powerful representation-learning insights of **Supervised Contrastive Learning (SCL)**.
+**Contrastive Forward-Forward (CFF)** bridges this gap by combining the layer-wise independence of the FF algorithm with the powerful representation-learning insights of **Supervised Contrastive Learning**.
 
 ### Key Features
 *   **Biologically Plausible:** Utilizes local loss functions after each layer, eliminating the need for a global backward pass.
